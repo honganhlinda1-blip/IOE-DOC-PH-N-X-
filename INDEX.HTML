@@ -1,0 +1,4189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phản xạ đọc hiểu 4 lớp</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#667085; --line:#e4e7ec;
+  --primary:#3157d5; --primary2:#6d4aff; --green:#0e9f6e; --green-bg:#e8f8f1;
+  --red:#d92d20; --red-bg:#fef3f2; --amber:#b54708; --amber-bg:#fffaeb;
+  --blue-bg:#eef4ff; --radius:18px; --shadow:0 12px 30px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:16px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 20px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:.02em;flex:0 0 auto}
+.brand strong{display:block;font-size:15px;line-height:1.2}
+.brand span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav-btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:11px;padding:9px 13px;font-weight:700;font-size:14px}
+.nav-btn:hover{border-color:#b9c7f5;background:#f8faff}
+.app{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;align-items:center;margin-bottom:18px}
+.hero h1{margin:6px 0 10px;font-size:38px;line-height:1.12;letter-spacing:-.03em}
+.hero p{margin:0;color:var(--muted);line-height:1.65;max-width:720px}
+.eyebrow{display:inline-flex;background:var(--blue-bg);color:var(--primary);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.hero-card{background:linear-gradient(135deg,#eef4ff,#f7f4ff);border:1px solid #dfe7ff;border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.hero-card strong{font-size:18px}
+.hero-card p{color:#475467;font-size:14px;line-height:1.6;margin:8px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+label.field{display:block;margin:0 0 14px;font-weight:700;font-size:14px;color:#344054}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;color:var(--text);outline:none;margin-top:6px}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,87,213,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;border:1px solid transparent;font-weight:800;text-decoration:none}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:0}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--text)}
+.btn.small{padding:7px 10px;border-radius:9px;font-size:12px}
+.btn:hover{filter:brightness(.98)}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-weight:400;color:var(--text)}
+.check input{width:18px;height:18px;margin-top:2px;flex:0 0 auto}
+.step{background:#f9fafc;border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:8px 0}
+.step b{font-size:14px}
+.step p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.quiz-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:18px;align-items:start}
+.quiz-head{margin-bottom:14px}
+.progress{height:8px;background:#e9edf5;border-radius:99px;overflow:hidden;margin-bottom:10px}
+.progress > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:99px;transition:width .25s}
+.quiz-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tag{display:inline-flex;align-items:center;background:#f4f6fa;color:#475467;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+.tag.easy{background:var(--green-bg);color:var(--green)}
+.tag.medium{background:var(--amber-bg);color:var(--amber)}
+.tag.hard{background:var(--red-bg);color:var(--red)}
+.tag.retest{background:#f4f0ff;color:#6d4aff}
+.passage{background:#f8faff;border:1px solid #e8eefc;border-radius:14px;padding:16px;line-height:1.65;margin-bottom:18px}
+.question-card h2{font-size:22px;line-height:1.35;margin:0 0 16px}
+.options{display:grid;gap:10px}
+.option{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;transition:.15s;color:var(--text)}
+.option:hover{border-color:#b9c7f5;background:#f9fbff;transform:translateY(-1px)}
+.option .letter{flex:0 0 28px;height:28px;border-radius:9px;background:#eef2ff;color:#3157d5;display:grid;place-items:center;font-weight:800;font-size:13px}
+.option.correct{border-color:var(--green);background:var(--green-bg)}
+.option.correct .letter{background:var(--green);color:#fff}
+.option.wrong{border-color:var(--red);background:var(--red-bg)}
+.option.wrong .letter{background:var(--red);color:#fff}
+.option:disabled{opacity:1;cursor:default}
+.reflection-card{position:sticky;top:88px}
+.reflection-card h3{margin-top:0}
+.reflection-card .field{margin-bottom:12px;font-size:13px}
+.layers{display:grid;gap:8px;margin-top:8px}
+.layer{display:flex;gap:10px;align-items:flex-start;background:#f9fafc;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:400}
+.layer input{width:16px;height:16px;margin-top:2px}
+.feedback{border-radius:14px;padding:16px;margin-top:16px;border:1px solid var(--line);background:#f9fafc}
+.feedback.ok{background:var(--green-bg);border-color:#b9e7d4}
+.feedback.bad{background:var(--red-bg);border-color:#f3b8b3}
+.fb-title{font-weight:900;font-size:17px;margin-bottom:10px}
+.feedback p{margin:7px 0;line-height:1.55}
+.next-actions{margin-top:16px;display:flex;justify-content:flex-end}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat{background:#f9fafc;border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+.stat strong{font-size:24px}
+.score-badge{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:150px;height:150px;border-radius:50%;background:#eef4ff;border:6px solid #fff;box-shadow:var(--shadow)}
+.score-badge.pass{background:var(--green-bg);color:var(--green)}
+.score-badge.fail{background:var(--red-bg);color:var(--red)}
+.score-badge span{font-size:34px;font-weight:900}
+.score-badge small{font-size:13px}
+.result-header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:18px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f8fafc;color:#475467;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.mini-stat{margin:10px 0}
+.mini-stat > div:first-child{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:5px}
+.bar{height:7px;background:#e9edf5;border-radius:99px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2))}
+.small{color:var(--muted);font-size:12px}
+.code-area{width:100%;min-height:90px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+details{margin-top:12px}
+summary{cursor:pointer;font-weight:800;color:var(--primary)}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#172033;color:#fff;padding:11px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){
+  .hero,.grid-2,.quiz-grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .reflection-card{position:static}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .result-header{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:560px){
+  .app{padding:16px 10px 40px}
+  .card{padding:16px}
+  .topbar{padding:10px 12px}
+  .brand span{display:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .score-badge{width:120px;height:120px}
+  .option{padding:11px}
+}
+@media print{
+  body{background:#fff}
+  .topbar,.toolbar,.btn,.toast{display:none!important}
+  .card{box-shadow:none;border-color:#ddd;break-inside:avoid}
+  .app{max-width:none;padding:0}
+  .table-wrap{overflow:visible}
+}
+.hidden{display:none}
+@media print{
+  body.print-result *{visibility:hidden}
+  body.print-result #resultCard, body.print-result #resultCard *{visibility:visible}
+  body.print-result #resultCard{position:absolute;left:0;top:0;width:100%;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">4L</div>
+    <div>
+      <strong>Phản xạ đọc hiểu</strong>
+      <span>Học sinh luyện – Giáo viên nhận báo cáo</span>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="showSetup()">Luyện tập</button>
+    <button class="nav-btn" onclick="showTeacher()">Báo cáo giáo viên</button>
+  </nav>
+</header>
+
+<main class="app" id="app"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+const app = document.getElementById("app");
+
+/* =========================================================
+   1. DỮ LIỆU 20 CÂU CHUẨN
+   ========================================================= */
+const QUESTION_BANK = [
+  {
+    id:"10_FL_01", theme:"Family Life & Daily Routines", diff:"Dễ", target:45,
+    passage:"In Mr. Brown’s family, both parents share housework equally. Every evening, Mr. Brown cooks dinner while his wife cleans the living room. Their children, Tom and Anna, help by washing the dishes after meals. This routine helps them build a strong family bond.",
+    question:"What do Tom and Anna do in the family routine?",
+    options:[
+      "They cook dinner every evening.",
+      "They clean the living room with their mother.",
+      "They wash the dishes after meals.",
+      "They share all housework equally with their parents."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"children, Tom and Anna, help by washing the dishes",
+    traps:["Đảo chủ thể","Chi tiết lạc đề"],
+    elimination:"A sai vì Mr. Brown nấu ăn. B sai vì vợ ông Brown dọn phòng khách. D sai vì bố mẹ chia việc nhà, còn hai con chỉ giúp rửa bát.",
+    strategy:"Quét từ khóa 'Tom and Anna', khoanh chủ thể, đối chiếu hành động chính xác.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_FL_02", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Teenagers often need about 8 to 10 hours of sleep each night to support their rapid physical growth. However, a recent survey shows that nearly 70% of high school students in the city sleep less than 7 hours because of heavy school workloads and late-night smartphone use.",
+    question:"According to the survey, why do most urban high school students sleep less than 7 hours?",
+    options:[
+      "Because they suffer from severe physical growth problems.",
+      "Because of heavy school workloads and using smartphones late at night.",
+      "Because they always prefer sleeping 8 to 10 hours a night.",
+      "Because school workloads prevent them from growing physically."
+    ],
+    answer:1,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"because of heavy school workloads and late-night smartphone use",
+    traps:["Đảo nguyên nhân–kết quả","Tuyệt đối hóa"],
+    elimination:"A đảo ngược nhân quả. C dùng 'always' tuyệt đối hóa và mâu thuẫn với việc ngủ ít. D sai ý so với bài.",
+    strategy:"Xác định 'why' → tìm cụm 'because of...' → kiểm tra 4 lớp.",
+    layerFocus:"L4 Mục đích/Nguyên nhân"
+  },
+  {
+    id:"10_FL_03", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Last weekend, Linda’s family planned to visit her grandparents in the countryside. Unfortunately, heavy rain forced them to cancel the trip. Instead, they stayed home and cooked a traditional meal together, which turned out to be a wonderful bonding experience.",
+    question:"What did Linda’s family actually do last weekend?",
+    options:[
+      "They successfully visited her grandparents in the countryside.",
+      "They traveled to the countryside despite the heavy rain.",
+      "They stayed at home and cooked a traditional meal together.",
+      "They had to cancel all their weekend plans without doing anything."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"Instead, they stayed home and cooked a traditional meal together",
+    traps:["Đảo thời gian","Sự kiện trái ngược"],
+    elimination:"A, B nhắc kế hoạch ban đầu nhưng đã bị hủy do mưa. D sai vì họ vẫn ở nhà nấu ăn cùng nhau, không phải 'không làm gì'.",
+    strategy:"Lưu ý từ chuyển ý 'Instead' (thay vào đó) để bắt sự kiện thực tế.",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_FL_04", theme:"Family Life & Daily Routines", diff:"Khó", target:75,
+    passage:"Although many parents believe that pocket money teaches children financial independence, some experts argue that giving too much cash without guidance may lead to bad spending habits and weaken responsibility.",
+    question:"What is the experts' view on giving children pocket money?",
+    options:[
+      "It always guarantees that children will become financially independent.",
+      "It never causes any negative effects if given in large amounts.",
+      "It may result in poor spending habits if children receive too much without proper guidance.",
+      "It completely destroys children's sense of responsibility in all cases."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"may lead to bad spending habits and weaken responsibility... without guidance",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'always' sai mức độ so với 'may'. B dùng 'never' trái ngược với ý cảnh báo. D dùng 'completely... in all cases' là tuyệt đối hóa phạm vi.",
+    strategy:"Chú ý từ chỉ mức độ/khả năng (may, might, can) để loại đáp án tuyệt đối (always, never, all).",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_FL_05", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Sharing housework helps children develop essential life skills. When children take part in cooking or cleaning, they learn how to take care of themselves when they live independently in the future.",
+    question:"What is the primary benefit of sharing housework for children mentioned in the text?",
+    options:[
+      "It helps them earn extra pocket money from their parents.",
+      "It teaches them essential life skills for future independent living.",
+      "It ensures they never have to do chores when they grow up.",
+      "It allows them to finish schoolwork much faster every day."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"help children develop essential life skills... live independently in the future",
+    traps:["Chi tiết ngoài bài"],
+    elimination:"A, D không xuất hiện trong đoạn. C mâu thuẫn với việc học kỹ năng tự lập để tự lo sau này.",
+    strategy:"Đối chiếu câu hỏi 'primary benefit' với câu chủ đề của đoạn.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_HE_01", theme:"Humans & Environment / Green Living", diff:"Dễ", target:45,
+    passage:"Green living involves making lifestyle choices that protect the environment. A simple way to start is by reducing plastic waste. Many local stores now offer reusable bags instead of single-use plastic bags to shoppers.",
+    question:"What are local stores doing to help reduce plastic waste?",
+    options:[
+      "They are banning shoppers from entering stores.",
+      "They are offering reusable bags instead of single-use plastic bags.",
+      "They are forcing shoppers to buy plastic bags every day.",
+      "They are producing single-use plastic bags for customers."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"offer reusable bags instead of single-use plastic bags",
+    traps:["Đảo ngược thông tin","Trái nghĩa"],
+    elimination:"A, C, D bịa đặt hoặc đảo ngược việc cửa hàng cung cấp túi tái sử dụng thay túi nhựa dùng một lần.",
+    strategy:"Quét 'local stores' → đọc kỹ cụm 'instead of'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_HE_02", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"In an effort to reduce carbon footprints, the local government announced that all public buses will switch from diesel to electric power by next year. Currently, engineers are testing the new charging stations across the city.",
+    question:"What is the current status of the public buses according to the text?",
+    options:[
+      "They have already completed the switch to electric power.",
+      "They are currently running entirely on diesel power while engineers test charging stations.",
+      "They will stop operating completely until next year.",
+      "They are being manufactured by engineers in the city center."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"will switch... by next year. Currently, engineers are testing...",
+    traps:["Đảo thời gian"],
+    elimination:"A sai thì (tương lai vs đã hoàn thành). C không có thông tin ngừng hoạt động. D sai chi tiết (kỹ sư kiểm tra trạm sạc, không sản xuất xe).",
+    strategy:"Kiểm tra L2: phân biệt 'by next year' (tương lai) và 'Currently' (hiện tại).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_HE_03", theme:"Humans & Environment / Green Living", diff:"Khó", target:75,
+    passage:"Planting trees in urban areas is often praised as an effective way to lower temperatures. However, researchers note that trees only provide significant cooling benefits if they are mature and planted in large, continuous clusters rather than isolated spots.",
+    question:"Under what condition do urban trees provide significant cooling benefits?",
+    options:[
+      "If they are planted anywhere in isolated spots across the city.",
+      "Unless they are young saplings planted by local residents.",
+      "Only if they are mature and planted in large, continuous clusters.",
+      "Provided that the city temperature is extremely high."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Điều kiện",
+    evidence:"only provide significant cooling benefits if they are mature and planted in large, continuous clusters rather than isolated spots",
+    traps:["Đảo điều kiện","Trái nghĩa nội dung"],
+    elimination:"A trái với 'rather than isolated spots'. B dùng 'unless' và 'young saplings' sai điều kiện (bài: mature). D thêm điều kiện ngoài bài.",
+    strategy:"Nhận diện từ nối điều kiện (only if, if, unless) để tránh bẫy đảo điều kiện.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_HE_04", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"Eco-friendly packaging has become a major trend among supermarket chains. While some critics argue that it increases product prices, most consumers are willing to pay extra because they care deeply about ocean conservation.",
+    question:"Why are most consumers willing to pay extra for eco-friendly packaging?",
+    options:[
+      "Because prices at supermarkets have decreased significantly.",
+      "Because they care deeply about ocean conservation.",
+      "Because critics forced supermarkets to raise product prices.",
+      "Because they want to test new packaging trends."
+    ],
+    answer:1,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"because they care deeply about ocean conservation",
+    traps:["Đảo mục đích","Chi tiết lạc đề"],
+    elimination:"A mâu thuẫn (giá tăng). C sai chủ thể (nhà phê bình không ép người tiêu dùng). D không phải động lực chính.",
+    strategy:"Tìm 'because' đi kèm đối tượng 'consumers'.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_HE_05", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"Renewable energy sources like solar and wind power are expanding rapidly. In 2025, solar energy supplied nearly 30% of the total electricity in the region, making it the fastest-growing clean energy source.",
+    question:"What was true about solar energy in the region in 2025?",
+    options:[
+      "It supplied all the electricity needed by local residents.",
+      "It supplied nearly 30% of the total electricity and grew the fastest.",
+      "It was replaced entirely by wind power during the year.",
+      "It provided less electricity than any other energy source."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"supplied nearly 30% of the total electricity... fastest-growing",
+    traps:["Đảo phạm vi","Tuyệt đối hóa"],
+    elimination:"A dùng 'all' sai, bài chỉ 'nearly 30%'. C, D sai lệch hoàn toàn so với thông tin.",
+    strategy:"Kiểm tra L3: 'nearly 30%' không phải 'all'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_MA_01", theme:"Music, Arts & Community Development", diff:"Dễ", target:45,
+    passage:"Music plays an essential role in teenagers' emotional development. Listening to upbeat songs can boost their mood after a stressful school day, while calming melodies help them relax before bedtime.",
+    question:"What do calming melodies help teenagers do?",
+    options:[
+      "Boost their mood immediately after school.",
+      "Relax before bedtime.",
+      "Study for school exams more effectively.",
+      "Compose upbeat songs for their friends."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"calming melodies help them relax before bedtime",
+    traps:["Đảo thời điểm","Trộn lẫn chi tiết"],
+    elimination:"A là tác dụng của nhạc sôi động sau giờ học. C, D không được đề cập.",
+    strategy:"Phân tách hai vế câu để không nhầm công dụng của từng loại nhạc.",
+    layerFocus:"L1 Chủ thể / L2 Thời gian"
+  },
+  {
+    id:"10_MA_02", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Volunteering at local community centers gives students valuable hands-on experience. Instead of just learning theory in classrooms, teenagers can apply communication skills directly while helping elderly people or teaching underprivileged children.",
+    question:"How do students benefit from volunteering at community centers according to the text?",
+    options:[
+      "They only learn theoretical concepts from textbooks.",
+      "They gain valuable hands-on experience and practice communication skills.",
+      "They earn a high salary for teaching underprivileged children.",
+      "They avoid going to regular classrooms at school."
+    ],
+    answer:1,
+    qtype:"How", infoType:"Nguyên nhân/Mục đích",
+    evidence:"gives students valuable hands-on experience... apply communication skills directly",
+    traps:["Đảo ý nghĩa","Chi tiết lạc đề"],
+    elimination:"A bẫy 'theory' (bài nói thay vì chỉ học lý thuyết). C sai chi tiết (tình nguyện không nhận lương cao). D sai vì không bỏ học.",
+    strategy:"Đọc kỹ 'Instead of...' để nắm ý chính thực sự được khẳng định.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_MA_03", theme:"Music, Arts & Community Development", diff:"Khó", target:75,
+    passage:"The school art exhibition was organized by the student council last Friday. While teachers initially worried about low student turnout, over five hundred visitors attended the opening night, exceeding all expectations.",
+    question:"What was teachers' initial expectation regarding the art exhibition?",
+    options:[
+      "They expected over five hundred visitors to attend the opening night.",
+      "They worried that student turnout would be low.",
+      "They believed the student council would cancel the event.",
+      "They knew it would exceed all previous attendance records."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"teachers initially worried about low student turnout",
+    traps:["Đảo thời gian","Trạng thái"],
+    elimination:"A lấy số 500 khách (thực tế) gán làm kỳ vọng ban đầu. C không có thông tin. D ngược với lo lắng ít.",
+    strategy:"Phân biệt 'initial' (ban đầu - lo ít) và 'actual result' (thực tế - hơn 500 người).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_MA_04", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Traditional music forms, such as Quan Ho or Ca Tru, are facing the risk of disappearing as younger generations lean towards modern pop music. Cultural experts suggest that schools should introduce traditional folk songs into music lessons to preserve national heritage.",
+    question:"What do cultural experts suggest to preserve traditional music?",
+    options:[
+      "Ban modern pop music completely from schools.",
+      "Introduce traditional folk songs into school music lessons.",
+      "Require all teenagers to become professional folk singers.",
+      "Replace modern music with foreign songs in classrooms."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"schools should introduce traditional folk songs into music lessons",
+    traps:["Tuyệt đối hóa","Đảo ý lệch lạc"],
+    elimination:"A dùng 'completely ban' không có trong bài. C, D sai mục đích và nội dung đề xuất.",
+    strategy:"Quét 'cultural experts suggest' → đối chiếu hành động đề xuất.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_MA_05", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Participating in school music clubs helps students build confidence. When shy members perform on stage for the first time, they overcome their stage fright and learn how to express themselves effectively in public.",
+    question:"What happens when shy members perform on stage for the first time?",
+    options:[
+      "They lose their confidence permanently.",
+      "They overcome their stage fright and learn public expression.",
+      "They refuse to participate in any future club activities.",
+      "They become professional stage directors immediately."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"overcome their stage fright and learn how to express themselves effectively",
+    traps:["Trái nghĩa","Phóng đại"],
+    elimination:"A ngược nghĩa (mất tự tin vĩnh viễn). C, D phi thực tế, không có trong bài.",
+    strategy:"Kiểm tra từ khóa hành động 'overcome stage fright'.",
+    layerFocus:"L1 Chủ thể / L2 Trạng thái"
+  },
+  {
+    id:"10_IT_01", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Dễ", target:45,
+    passage:"Smartphones have revolutionized how students learn languages. With various translation apps and interactive flashcards, learners can practice vocabulary anywhere without carrying heavy dictionaries.",
+    question:"How do translation apps on smartphones help language learners?",
+    options:[
+      "They force learners to carry heavy dictionaries.",
+      "They allow learners to practice vocabulary anywhere without heavy dictionaries.",
+      "They make it impossible to learn new vocabulary outside of classrooms.",
+      "They replace human teachers completely in all schools."
+    ],
+    answer:1,
+    qtype:"How", infoType:"Hành động/Sự kiện",
+    evidence:"practice vocabulary anywhere without carrying heavy dictionaries",
+    traps:["Đảo ngược phủ định","Phóng đại"],
+    elimination:"A đảo 'without' thành 'force to carry'. C, D mâu thuẫn và phóng đại.",
+    strategy:"Chú ý giới từ phủ định (without, unlike, instead of).",
+    layerFocus:"L1 Chủ thể / L2 Phủ định"
+  },
+  {
+    id:"10_IT_02", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Online learning platforms offer great flexibility, but they require strong self-discipline. A study revealed that students who lack good time-management skills often fall behind in their coursework.",
+    question:"According to the study, which students tend to fall behind in online courses?",
+    options:[
+      "Those who possess excellent time-management skills.",
+      "Those who lack good time-management skills.",
+      "Those who spend too much time studying in traditional classrooms.",
+      "Those who always complete their coursework ahead of schedule."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Chủ thể",
+    evidence:"students who lack good time-management skills often fall behind",
+    traps:["Đảo tính chất đối lập"],
+    elimination:"A, D nói ngược đối tượng gặp khó khăn. C không liên quan đến học truyền thống.",
+    strategy:"Quét 'fall behind' → tìm chính xác đặc điểm 'lack good time-management'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_IT_03", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Khó", target:75,
+    passage:"Artificial Intelligence tools can assist teachers by grading multiple-choice quizzes automatically. However, human teachers are still irreplaceable when it comes to inspiring students and nurturing emotional intelligence.",
+    question:"What limitation of AI tools is implied in the text?",
+    options:[
+      "They can grade all types of assignments, including complex essays, just like humans.",
+      "They are completely unable to assist teachers with any classroom tasks.",
+      "They cannot replace human teachers in inspiring students and nurturing emotional intelligence.",
+      "They always cause teachers to lose their jobs immediately."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"human teachers are still irreplaceable when it comes to inspiring students and nurturing emotional intelligence",
+    traps:["Tuyệt đối hóa","Phóng đại"],
+    elimination:"A sai vì AI chỉ chấm trắc nghiệm. B sai vì AI có hỗ trợ. D dùng 'always... immediately' tuyệt đối hóa.",
+    strategy:"Phân tích ranh giới: AI làm được gì và không thay thế được gì.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_IT_04", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Maintaining a healthy lifestyle requires regular physical activity and a balanced diet. Nutritionists advise eating plenty of green vegetables while cutting down on processed sugars to prevent chronic illnesses.",
+    question:"What do nutritionists recommend to prevent chronic illnesses?",
+    options:[
+      "Eating plenty of green vegetables and reducing processed sugars.",
+      "Consuming more processed sugars and avoiding vegetables.",
+      "Exercising heavily without paying attention to daily diet.",
+      "Stopping all physical activities immediately."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"eating plenty of green vegetables while cutting down on processed sugars",
+    traps:["Đảo ngược thông tin","Đảo chiều tác động"],
+    elimination:"B nói ngược (tiêu thụ nhiều đường). C, D bỏ qua hoặc phủ định yếu tố cốt lõi.",
+    strategy:"Đối chiếu hành động kép: ăn rau xanh + giảm đường chế biến.",
+    layerFocus:"L1 Chủ thể / L3 Phạm vi"
+  },
+  {
+    id:"10_IT_05", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Regular exercise not only improves cardiovascular health but also reduces stress levels significantly. Walking briskly for thirty minutes a day can boost mental clarity and energy throughout the afternoon.",
+    question:"What is one of the mental benefits of brisk walking for thirty minutes a day?",
+    options:[
+      "It increases physical stress levels during the afternoon.",
+      "It boosts mental clarity and energy.",
+      "It causes severe fatigue right after exercising.",
+      "It destroys cardiovascular health over time."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"boost mental clarity and energy throughout the afternoon",
+    traps:["Trái nghĩa","Đảo chiều tác động"],
+    elimination:"A ngược nghĩa (giảm căng thẳng). C, D trái ngược lợi ích sức khỏe được nêu.",
+    strategy:"Kiểm tra từ khóa lợi ích tinh thần (mental clarity).",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_NEW_01", theme:"Technology and Education", diff:"Dễ", target:45,
+    passage:"Many students now use tablets and educational apps to study. These tools make lessons more interactive and help learners practise English anytime. However, spending too much time on screens can cause eye strain and reduce sleep quality.",
+    question:"What is one benefit of using educational apps mentioned in the passage?",
+    options:[
+      "They make lessons more interactive.",
+      "They increase eye strain.",
+      "They reduce sleep quality.",
+      "They replace teachers completely."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Lợi ích",
+    evidence:"These tools make lessons more interactive",
+    traps:["Đảo ngược lợi ích/hại","Chi tiết lạc đề"],
+    elimination:"B, C là tác hại. D phóng đại, bài không nói thay thế giáo viên.",
+    strategy:"Tìm từ khóa 'benefit' → đối chiếu cụm 'make lessons more interactive'.",
+    layerFocus:"L4 Mục đích/Lợi ích"
+  },
+  {
+    id:"10_NEW_02", theme:"Technology and Education", diff:"Trung bình", target:60,
+    passage:"Online learning platforms offer flexibility, but success depends on self-discipline. Students who cannot manage their time well often submit assignments late and fall behind in their courses.",
+    question:"According to the passage, which students tend to fall behind in online courses?",
+    options:[
+      "Those with excellent time-management skills.",
+      "Those who cannot manage their time well.",
+      "Those who always submit assignments early.",
+      "Those who study in traditional classrooms."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Đối tượng/Đặc điểm",
+    evidence:"Students who cannot manage their time well often ... fall behind",
+    traps:["Đảo tính chất đối lập","Tuyệt đối hóa"],
+    elimination:"A, D nói ngược đối tượng. C dùng 'always' tuyệt đối hóa.",
+    strategy:"Tìm 'fall behind' → đối chiếu 'cannot manage their time well'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_NEW_03", theme:"Environment and Climate Change", diff:"Trung bình", target:60,
+    passage:"Climate change is mainly caused by greenhouse gases from burning fossil fuels. To reduce emissions, many cities are encouraging residents to use public transport, cycle or walk instead of driving private cars.",
+    question:"Why are cities encouraging residents to use public transport?",
+    options:[
+      "To increase carbon emissions.",
+      "To reduce emissions from private cars.",
+      "To promote fossil fuel use.",
+      "To cause more traffic jams."
+    ],
+    answer:1,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"To reduce emissions, many cities are encouraging residents to use public transport",
+    traps:["Đảo mục đích","Trái nghĩa"],
+    elimination:"A, C, D trái ngược mục đích giảm phát thải.",
+    strategy:"Tìm 'Why' → cụm 'To reduce emissions'.",
+    layerFocus:"L4 Mục đích/Nguyên nhân"
+  },
+  {
+    id:"10_NEW_04", theme:"Environment and Climate Change", diff:"Khó", target:75,
+    passage:"While solar panels can generate clean electricity, their effectiveness depends on sunlight exposure. In cloudy regions, solar energy may not be the most efficient choice unless combined with wind power or other renewable sources.",
+    question:"Under what condition may solar energy not be the most efficient choice?",
+    options:[
+      "If it is combined with wind power.",
+      "If the region has little sunlight.",
+      "If the panels are new.",
+      "If electricity demand is low."
+    ],
+    answer:1,
+    qtype:"Under what condition", infoType:"Điều kiện",
+    evidence:"In cloudy regions, solar energy may not be the most efficient choice",
+    traps:["Đảo điều kiện","Trái nghĩa nội dung"],
+    elimination:"A là giải pháp, không phải điều kiện kém hiệu quả. C, D không được nêu.",
+    strategy:"Tìm 'Under what condition' → cụm 'In cloudy regions'.",
+    layerFocus:"L3 Phạm vi/Điều kiện"
+  },
+  {
+    id:"10_NEW_05", theme:"Health and Well-being", diff:"Dễ", target:45,
+    passage:"Regular exercise improves both physical and mental health. It strengthens the heart, helps maintain a healthy weight and reduces stress after a busy day.",
+    question:"What is one mental benefit of regular exercise mentioned in the passage?",
+    options:[
+      "It strengthens the heart.",
+      "It reduces stress.",
+      "It increases body weight.",
+      "It causes sleep problems."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Lợi ích tinh thần",
+    evidence:"reduces stress after a busy day",
+    traps:["Trộn lẫn lợi ích thể chất/tinh thần","Trái nghĩa"],
+    elimination:"A là lợi ích thể chất. C, D trái ngược.",
+    strategy:"Tìm 'mental benefit' → 'reduces stress'.",
+    layerFocus:"L4 Mục đích/Lợi ích"
+  },
+  {
+    id:"10_NEW_06", theme:"Health and Well-being", diff:"Trung bình", target:60,
+    passage:"Nutritionists recommend eating plenty of vegetables and cutting down on processed sugars to prevent chronic illnesses. A balanced diet combined with regular exercise offers the best protection.",
+    question:"What do nutritionists recommend to prevent chronic illnesses?",
+    options:[
+      "Eating more processed sugars.",
+      "Eating plenty of vegetables and cutting down on processed sugars.",
+      "Avoiding all physical activity.",
+      "Eating only fast food."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Khuyến nghị",
+    evidence:"eating plenty of vegetables and cutting down on processed sugars",
+    traps:["Đảo ngược khuyến nghị","Tuyệt đối hóa"],
+    elimination:"A, D trái khuyến nghị. C bỏ qua yếu tố cốt lõi.",
+    strategy:"Tìm 'recommend' → đối chiếu hành động kép.",
+    layerFocus:"L4 Mục đích/Khuyến nghị"
+  },
+  {
+    id:"10_NEW_07", theme:"Social Media and Communication", diff:"Trung bình", target:60,
+    passage:"Social media helps people stay connected, but misinformation can spread quickly. Experts advise users to verify information before sharing and to limit screen time to protect mental health.",
+    question:"What do experts advise users to do before sharing information?",
+    options:[
+      "Share it immediately.",
+      "Verify the information.",
+      "Increase screen time.",
+      "Ignore the source."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Khuyến nghị",
+    evidence:"verify information before sharing",
+    traps:["Đảo khuyến nghị","Trái nghĩa"],
+    elimination:"A, C, D trái khuyến nghị của chuyên gia.",
+    strategy:"Tìm 'advise' → 'verify information before sharing'.",
+    layerFocus:"L4 Mục đích/Khuyến nghị"
+  },
+  {
+    id:"10_NEW_08", theme:"Cultural Diversity and Globalization", diff:"Khó", target:75,
+    passage:"While globalization promotes cultural exchange, it may also threaten local traditions. Some communities are losing their unique identity as global brands and media become more dominant. Preserving heritage requires both government support and community engagement.",
+    question:"What is needed to preserve cultural heritage according to the passage?",
+    options:[
+      "Only government support.",
+      "Only community engagement.",
+      "Both government support and community engagement.",
+      "Banning global brands completely."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Yêu cầu/Điều kiện",
+    evidence:"requires both government support and community engagement",
+    traps:["Tuyệt đối hóa (only)","Đảo phạm vi"],
+    elimination:"A, B chỉ nêu một phần. D tuyệt đối hóa, không có trong bài.",
+    strategy:"Tìm 'requires' → 'both ... and ...'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_NEW_09", theme:"Career and Job Skills", diff:"Trung bình", target:60,
+    passage:"Employers value candidates with strong communication and problem-solving skills. Continuous learning is also important because technology and industries change rapidly.",
+    question:"Why is continuous learning important according to the passage?",
+    options:[
+      "Because technology and industries change rapidly.",
+      "Because employers dislike learning.",
+      "Because it guarantees a high salary.",
+      "Because it is not necessary."
+    ],
+    answer:0,
+    qtype:"Why", infoType:"Nguyên nhân",
+    evidence:"because technology and industries change rapidly",
+    traps:["Đảo nguyên nhân","Chi tiết lạc đề"],
+    elimination:"B, C, D không được nêu hoặc sai.",
+    strategy:"Tìm 'Why' → 'because technology and industries change rapidly'.",
+    layerFocus:"L4 Mục đích/Nguyên nhân"
+  },
+  {
+    id:"10_NEW_10", theme:"Science and Innovation", diff:"Khó", target:75,
+    passage:"Artificial intelligence can assist teachers by grading multiple-choice quizzes automatically. However, human teachers remain irreplaceable when it comes to inspiring students and nurturing emotional intelligence.",
+    question:"What limitation of AI tools is implied in the passage?",
+    options:[
+      "They can grade all types of assignments.",
+      "They cannot inspire students or nurture emotional intelligence.",
+      "They always replace human teachers.",
+      "They are unable to assist with any tasks."
+    ],
+    answer:1,
+    qtype:"What limitation", infoType:"Hạn chế",
+    evidence:"human teachers are still irreplaceable when it comes to inspiring students and nurturing emotional intelligence",
+    traps:["Tuyệt đối hóa","Phóng đại"],
+    elimination:"A sai phạm vi (chỉ trắc nghiệm). C, D tuyệt đối hóa.",
+    strategy:"Tìm 'limitation' → 'irreplaceable when it comes to inspiring...'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  }
+];
+
+/* =========================================================
+   2. BỘ TÁI KIỂM TRA 24 GIỜ
+   ========================================================= */
+const RETEST_24H = [
+  {
+    id:"R24_01", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"The headmaster praised the voluntary group for their hard work.",
+    question:"Who praised whom?",
+    options:[
+      "The headmaster praised the voluntary group.",
+      "The voluntary group praised the headmaster.",
+      "The teachers praised both the headmaster and the group.",
+      "The headmaster praised the students in his class."
+    ],
+    answer:0,
+    qtype:"Who", infoType:"Chủ thể",
+    evidence:"The headmaster praised the voluntary group",
+    traps:["Đảo chủ thể"],
+    elimination:"B đảo chủ thể. C, D thêm chủ thể không có trong câu.",
+    strategy:"Khoanh tròn chủ ngữ và tân ngữ; xác định ai khen ai.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"R24_02", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"The science club will launch a new project next month.",
+    question:"When will the science club launch the project?",
+    options:[
+      "Last week.",
+      "Next month.",
+      "Yesterday.",
+      "It has already been launched."
+    ],
+    answer:1,
+    qtype:"When", infoType:"Thời gian/Trạng thái",
+    evidence:"will launch... next month",
+    traps:["Đảo thời gian"],
+    elimination:"A, C, D đảo thời gian về quá khứ hoặc bảo đã xảy ra, trái với 'will launch next month'.",
+    strategy:"Kiểm tra thì (will launch: tương lai; launched: quá khứ).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"R24_03", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Regular physical activity usually helps reduce stress.",
+    question:"Which statement is closest to the passage?",
+    options:[
+      "Regular physical activity always eliminates stress completely.",
+      "Regular physical activity usually helps reduce stress.",
+      "Regular physical activity never reduces stress.",
+      "Only intense exercise can reduce stress."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Phạm vi/Mức độ",
+    evidence:"usually helps reduce stress",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'always... completely'. C dùng 'never'. D dùng 'only'. Tất cả đều lệch mức độ của 'usually'.",
+    strategy:"Chú ý usually (thường) khác hoàn toàn với always/completely/never.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R24_04", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Students can join the trip only if they finish their essays.",
+    question:"What condition must students meet to join the trip?",
+    options:[
+      "They must finish their essays.",
+      "They must not finish their essays.",
+      "They must pay a fee.",
+      "They can join the trip unless they finish their essays."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Điều kiện",
+    evidence:"only if they finish their essays",
+    traps:["Đảo điều kiện"],
+    elimination:"B phủ định điều kiện. C thêm phí ngoài bài. D dùng 'unless' làm đảo ngược điều kiện.",
+    strategy:"Phân biệt only if (chỉ khi) và unless (trừ khi / nếu không).",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R24_05", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Air pollution in large cities is mainly caused by vehicle emissions and industrial activity. In rural areas, the population is growing slowly.",
+    question:"What mainly causes air pollution in large cities?",
+    options:[
+      "Vehicle emissions and industrial activity.",
+      "Rapid population growth in rural areas.",
+      "A lack of public parks.",
+      "Too many bicycles in the countryside."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"Air pollution in large cities is mainly caused by vehicle emissions and industrial activity",
+    traps:["Chi tiết lạc đề"],
+    elimination:"B là chi tiết có thể đúng thực tế nhưng lạc đề. C, D không có trong bài.",
+    strategy:"Kiểm tra L4: chi tiết đó có trả lời đúng câu hỏi về thành phố lớn không?",
+    layerFocus:"L4 Mục đích"
+  }
+];
+
+/* =========================================================
+   3. ÔN 7 NGÀY – 5 CÂU ĐA BẪY
+   ========================================================= */
+const RETEST_7D = [
+  {
+    id:"R7_01", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"Urban planners are increasingly promoting green roofs on public buildings. A recent study found that green roofs can reduce indoor temperatures by up to five degrees during hot months, but only when the plants receive enough water and the roof is well insulated. The researchers stress that a green roof is not a substitute for reducing energy consumption overall; it is one of several measures that cities can use.",
+    question:"According to the study, what is true about green roofs?",
+    options:[
+      "They always reduce indoor temperatures by exactly five degrees in every building.",
+      "They can reduce indoor temperatures, but only under certain conditions and as one of several measures.",
+      "They replace the need to reduce energy consumption completely.",
+      "They work best when plants are never watered."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"can reduce indoor temperatures by up to five degrees... but only when... one of several measures",
+    traps:["Tuyệt đối hóa","Đảo phạm vi"],
+    elimination:"A dùng 'always' và 'exactly five degrees' sai mức độ. C nói 'completely' trái với 'not a substitute'. D ngược điều kiện 'enough water'.",
+    strategy:"So sánh từ mềm 'can/up to/only when' với từ tuyệt đối 'always/completely'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R7_02", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"An online language course is popular because learners can study at any time. However, teachers warn that flexibility alone does not guarantee success. Students who set a fixed weekly schedule and submit assignments regularly tend to make faster progress than those who study only when they feel motivated. The course designers therefore recommend short daily sessions rather than long weekend sessions.",
+    question:"What do the course designers recommend for better progress?",
+    options:[
+      "Studying only when feeling motivated.",
+      "Short daily sessions rather than long weekend sessions.",
+      "Avoiding a fixed schedule to keep flexibility.",
+      "Completing all assignments only at weekends."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"recommend short daily sessions rather than long weekend sessions",
+    traps:["Đảo thời gian","Đảo điều kiện"],
+    elimination:"A là nhóm tiến bộ chậm. C ngược với 'fixed weekly schedule'. D sai vì bài khuyến nghị hằng ngày, không phải cuối tuần.",
+    strategy:"Tìm cụm 'recommend' và đối chiếu cấu trúc 'rather than'.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"R7_03", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"Many people believe that drinking more water automatically improves skin health. Dermatologists say the relationship is more limited: adequate hydration supports overall health, but there is little evidence that extra water clears acne or removes wrinkles. They recommend a balanced diet, enough sleep, and sun protection instead of focusing only on water intake.",
+    question:"What do dermatologists say about drinking extra water for skin health?",
+    options:[
+      "Extra water always clears acne and removes wrinkles.",
+      "Adequate hydration supports health, but extra water is not proven to clear acne or remove wrinkles.",
+      "Drinking water is the only effective skin treatment.",
+      "Water intake has no effect on any part of health."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"adequate hydration supports overall health... little evidence that extra water clears acne or removes wrinkles",
+    traps:["Tuyệt đối hóa","Đảo phạm vi"],
+    elimination:"A dùng 'always'. C dùng 'only'. D nói 'no effect on any part' trái với 'supports overall health'.",
+    strategy:"Chú ý 'little evidence' và 'instead of only' để loại các đáp án tuyệt đối.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R7_04", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"The town library extended its opening hours last month to help students prepare for exams. Although the new schedule was welcomed by many, the library director noted that most users still visit in the afternoon. She plans to run a survey before deciding whether to keep the late-night opening, because electricity costs have risen and staff are limited.",
+    question:"Why does the library director plan to run a survey?",
+    options:[
+      "Because most users visit in the afternoon and costs/staff are concerns.",
+      "Because the new schedule was rejected by all students.",
+      "Because the library wants to close permanently.",
+      "Because electricity costs have fallen."
+    ],
+    answer:0,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"most users still visit in the afternoon... electricity costs have risen and staff are limited",
+    traps:["Đảo nguyên nhân–kết quả","Tuyệt đối hóa"],
+    elimination:"B dùng 'all' và 'rejected' sai. C, D ngược thông tin.",
+    strategy:"Tìm từ 'because' ở cuối câu và kiểm tra lý do thực tế.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"R7_05", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"A school choir recently performed at a local festival. The audience included students, parents, and several local artists. While the choir received positive comments, the conductor said that the most important outcome was not the applause but the members' improved cooperation. She added that future performances should include more songs from different cultures.",
+    question:"According to the conductor, what was the most important outcome of the performance?",
+    options:[
+      "The number of local artists in the audience.",
+      "The applause from the audience.",
+      "The choir members' improved cooperation.",
+      "The decision to stop performing."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"the most important outcome was not the applause but the members' improved cooperation",
+    traps:["Chi tiết lạc đề","Đảo mục đích"],
+    elimination:"A là chi tiết đúng nhưng lạc đề. B là điều bài phủ định là quan trọng nhất. D không có trong bài.",
+    strategy:"Chú ý cấu trúc 'not A but B' để xác định ý chính.",
+    layerFocus:"L4 Mục đích"
+  }
+];
+
+/* =========================================================
+   4. DỌN LỖI CÁ NHÂN – 3 CÂU
+   ========================================================= */
+const PERSONAL = [
+  {
+    id:"P_01", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"The new app does not work offline.",
+    question:"Which statement is true according to the sentence?",
+    options:[
+      "The app works offline.",
+      "The app does not work offline.",
+      "The app works only offline.",
+      "The app always works offline."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Hành động/Sự kiện",
+    evidence:"does not work offline",
+    traps:["Đảo phủ định"],
+    elimination:"A đảo phủ định. C, D thêm 'only/always' không có trong câu.",
+    strategy:"Gạch chân từ phủ định: not, never, fail to, without.",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"P_02", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"The teacher asked the students to submit their projects. The students then asked the teacher for feedback.",
+    question:"Who asked for feedback?",
+    options:[
+      "The teacher asked the students.",
+      "The students asked the teacher.",
+      "Both asked for feedback.",
+      "Neither asked for feedback."
+    ],
+    answer:1,
+    qtype:"Who", infoType:"Chủ thể",
+    evidence:"The students then asked the teacher for feedback",
+    traps:["Đảo chủ thể"],
+    elimination:"A đảo chủ thể. C, D sai vì chỉ học sinh hỏi.",
+    strategy:"Khoanh tròn chủ thể của hành động 'asked for feedback'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"P_03", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"Many students may benefit from short breaks during long study sessions.",
+    question:"Which answer matches the sentence?",
+    options:[
+      "All students must take short breaks.",
+      "Many students may benefit from short breaks.",
+      "No student benefits from short breaks.",
+      "Short breaks always fail."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Phạm vi/Mức độ",
+    evidence:"Many students may benefit",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'All... must'. C dùng 'No'. D dùng 'always' trái với 'may benefit'.",
+    strategy:"Đối chiếu 'many/may' với 'all/must/always'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  }
+];
+
+/* =========================================================
+   5. CẤU HÌNH & HÀM TIỆN ÍCH
+   ========================================================= */
+const ALL_QUESTIONS = [...QUESTION_BANK, ...RETEST_24H, ...RETEST_7D, ...PERSONAL];
+const QMAP = Object.fromEntries(ALL_QUESTIONS.map(q => [q.id, q]));
+
+const MODE_LABELS = {
+  practice: "Luyện 20 câu chuẩn",
+  retest24: "Tái kiểm tra 24h",
+  retest7: "Ôn 7 ngày",
+  personal: "Dọn lỗi cá nhân"
+};
+
+const QTYPE_OPTIONS = ["Who","What","When","Where","Why","How","How many","Which"];
+const INFO_TYPES = ["Chủ thể","Hành động/Sự kiện","Thời gian/Trạng thái","Nguyên nhân/Mục đích","Phạm vi/Mức độ","Điều kiện"];
+
+const LS_KEY = "phx_results_v1";
+let state = { finished: true };
+let lastResult = null;
+let teacherClass = "";
+let teacherFiltered = [];
+let memoryResults = [];
+
+function escapeHtml(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+}
+
+function selected(value, current){
+  return String(value) === String(current) ? "selected" : "";
+}
+
+function checked(arr, val){
+  return (arr || []).includes(String(val)) ? "checked" : "";
+}
+
+function formatTime(sec){
+  sec = Math.max(0, Math.floor(Number(sec) || 0));
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function formatDate(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString("vi-VN", {
+    hour:"2-digit", minute:"2-digit", day:"2-digit", month:"2-digit", year:"numeric"
+  });
+}
+
+function diffClass(diff){
+  const d = String(diff || "").toLowerCase();
+  if (d.includes("dễ") || d.includes("easy")) return "easy";
+  if (d.includes("trung") || d.includes("medium")) return "medium";
+  if (d.includes("khó") || d.includes("hard")) return "hard";
+  return "retest";
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function copyText(text){
+  if (!text) return;
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text)
+      .then(() => showToast("Đã sao chép"))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); showToast("Đã sao chép"); }
+  catch(e){ showToast("Không thể sao chép tự động"); }
+  ta.remove();
+}
+
+function getPrefs(){
+  try {
+    return JSON.parse(localStorage.getItem("phx_user_v1") || "{}");
+  } catch(e){
+    return {};
+  }
+}
+
+function savePrefs(student, className){
+  try {
+    localStorage.setItem("phx_user_v1", JSON.stringify({student, className}));
+  } catch(e){}
+}
+
+function getResults(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return memoryResults;
+}
+
+function saveResults(arr){
+  memoryResults = arr;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); } catch(e){}
+}
+
+function saveResult(result){
+  const arr = getResults();
+  const idx = arr.findIndex(x => x.id === result.id);
+  if (idx >= 0) arr[idx] = result;
+  else arr.push(result);
+  saveResults(arr);
+}
+
+/* =========================================================
+   6. MÃ HÓA KẾT QUẢ ĐỂ GỬI GIÁO VIÊN
+   ========================================================= */
+function b64urlEncodeUtf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlDecodeUtf8(code){
+  let base64 = code.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4) base64 += "=";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeResult(obj){
+  const copy = { ...obj };
+  delete copy.code;
+  return "PHX1." + b64urlEncodeUtf8(JSON.stringify(copy));
+}
+
+function decodeResult(code){
+  if (typeof code !== "string" || !code.startsWith("PHX1.")) throw new Error("bad code");
+  const obj = JSON.parse(b64urlDecodeUtf8(code.slice(5)));
+  if (!obj || !Array.isArray(obj.answers) || !obj.student) throw new Error("bad result");
+  return obj;
+}
+
+/* =========================================================
+   7. MÀN HÌNH THIẾT LẬP
+   ========================================================= */
+function renderSetup(){
+  const prefs = getPrefs();
+
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Kỹ thuật phản xạ 4 lớp</div>
+        <h1>Biến “đọc hiểu” thành phản xạ</h1>
+        <p>
+          Học sinh làm 20 câu chuẩn, ghi phiếu phản xạ trước khi chốt đáp án.
+          Giáo viên nhận báo cáo theo bẫy, độ khó, chủ đề và từng học sinh.
+          Không cần đăng nhập; dữ liệu lưu trên máy hoặc gửi bằng mã kết quả.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>4 lớp kiểm tra</strong>
+        <p>L1 Chủ thể · L2 Thời gian/Trạng thái · L3 Phạm vi/Mức độ · L4 Mục đích câu hỏi</p>
+        <span class="small">Mỗi câu có bằng chứng, loại bẫy, cách loại trừ và chiến lược phản xạ.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="grid-2">
+        <div>
+          <h2 style="margin-top:0">Thiết lập lượt luyện</h2>
+          <label class="field">
+            Họ tên học sinh
+            <input id="studentName" value="${escapeHtml(prefs.student || "")}" placeholder="Nhập họ tên">
+          </label>
+          <label class="field">
+            Lớp
+            <input id="className" value="${escapeHtml(prefs.className || "")}" placeholder="Ví dụ: 10A1">
+          </label>
+          <label class="field">
+            Chế độ luyện
+            <select id="mode">
+              <option value="practice">Luyện 20 câu chuẩn (Dễ → Khó)</option>
+              <option value="retest24">Tái kiểm tra 24h (5 bẫy)</option>
+              <option value="retest7">Ôn 7 ngày (5 câu đa bẫy)</option>
+              <option value="personal">Dọn lỗi cá nhân (3 câu)</option>
+            </select>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="requireReflection" checked>
+            <span>
+              <b>Bắt buộc ghi phiếu phản xạ 4 lớp</b>
+              <br><span class="small">Khuyến nghị bật để luyện phản xạ; tắt nếu chỉ cần kiểm tra nhanh.</span>
+            </span>
+          </label>
+          <div class="toolbar" style="margin-top:16px">
+            <button class="btn primary" onclick="startQuiz()">Bắt đầu luyện</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0">Quy trình 4 bước</h3>
+          <div class="step">
+            <b>1. Đọc câu hỏi &amp; gạch chân từ khóa</b>
+            <p>Xác định đối tượng, hành động hoặc từ để hỏi: Who, What, When, Where, Why, How, How many.</p>
+          </div>
+          <div class="step">
+            <b>2. Xác định loại thông tin</b>
+            <p>Khoanh vùng: chủ thể, thời gian, trạng thái, phạm vi/mức độ hay mục đích.</p>
+          </div>
+          <div class="step">
+            <b>3. Quét đoạn đọc &amp; paraphrase</b>
+            <p>Tìm vùng chứa từ khóa hoặc từ đồng nghĩa/cấu trúc tương đương.</p>
+          </div>
+          <div class="step">
+            <b>4. Kiểm tra 4 lớp trước khi chọn</b>
+            <p>L1 Chủ thể · L2 Thời gian/Trạng thái · L3 Phạm vi/Mức độ · L4 Mục đích câu hỏi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Tiêu chí nghiệm thu</h2>
+      <div class="stats-grid">
+        <div class="stat"><span>Đạt chuẩn gợi ý</span><strong>≥80%</strong></div>
+        <div class="stat"><span>Phản xạ</span><strong>4/4 lớp</strong></div>
+        <div class="stat"><span>Tái kiểm tra</span><strong>24h</strong></div>
+        <div class="stat"><span>Ôn duy trì</span><strong>7 ngày</strong></div>
+      </div>
+      <p class="small">
+        Học sinh sai câu nào sẽ được chuyển vào bộ tái kiểm tra theo bẫy sai.
+        Giáo viên có thể nhập mã kết quả từ học sinh để tổng hợp cả lớp.
+      </p>
+    </section>
+  `;
+}
+
+/* =========================================================
+   8. BẮT ĐẦU / VẼ CÂU HỎI
+   ========================================================= */
+function beginQuiz(opts = {}){
+  stopTimer();
+  const mode = opts.mode || "practice";
+  const student = opts.student || "Học sinh";
+  const className = opts.className || "Chưa rõ";
+  const requireReflection = opts.requireReflection !== false;
+  const questions = opts.questions && opts.questions.length ? opts.questions : getQuestions(mode);
+
+  state = {
+    mode,
+    student,
+    className,
+    requireReflection,
+    questions,
+    current: 0,
+    answers: [],
+    reflections: {},
+    start: Date.now(),
+    timerId: null,
+    answered: false,
+    finished: false,
+    qStart: 0,
+    modeLabel: MODE_LABELS[mode] || mode
+  };
+
+  savePrefs(student, className);
+  renderQuiz();
+}
+
+function startQuiz(){
+  const name = document.getElementById("studentName")?.value.trim() || "Học sinh";
+  const className = document.getElementById("className")?.value.trim() || "Chưa rõ";
+  const mode = document.getElementById("mode")?.value || "practice";
+  const requireReflection = document.getElementById("requireReflection")?.checked ?? true;
+  beginQuiz({ mode, student: name, className, requireReflection });
+}
+
+function getQuestions(mode){
+  if (mode === "retest24") return RETEST_24H;
+  if (mode === "retest7") return RETEST_7D;
+  if (mode === "personal") return PERSONAL;
+  return QUESTION_BANK;
+}
+
+function renderQuiz(){
+  stopTimer();
+  const q = state.questions[state.current];
+  if (!q){ finishQuiz(); return; }
+
+  const total = state.questions.length;
+  const progress = (state.current / total) * 100;
+  const ref = state.reflections[q.id] || { qtype:"", infoType:"", evidence:"", layers:[] };
+
+  const optionHtml = q.options.map((opt, i) => `
+    <button type="button" class="option" data-index="${i}">
+      <span class="letter">${String.fromCharCode(65 + i)}</span>
+      <span>${escapeHtml(opt)}</span>
+    </button>
+  `).join("");
+
+  app.innerHTML = `
+    <section class="quiz-head">
+      <div class="progress"><div style="width:${progress}%"></div></div>
+      <div class="quiz-meta">
+        <span>Câu ${state.current + 1}/${total}</span>
+        <span>Mục tiêu: ${q.target}s</span>
+        <span id="timer">00:00</span>
+      </div>
+    </section>
+
+    <div class="quiz-grid">
+      <section class="card question-card">
+        <div class="tags">
+          <span class="tag ${diffClass(q.diff)}">${escapeHtml(q.diff)}</span>
+          <span class="tag">${escapeHtml(q.theme)}</span>
+          <span class="tag">${escapeHtml(q.qtype)}</span>
+        </div>
+
+        <div class="passage">${escapeHtml(q.passage)}</div>
+        <h2>${escapeHtml(q.question)}</h2>
+
+        <div class="options">${optionHtml}</div>
+        <div id="feedback" class="feedback hidden"></div>
+        <div id="nextActions" class="next-actions"></div>
+      </section>
+
+      <aside class="card reflection-card" id="reflectionPanel">
+        <h3>Phiếu phản xạ 4 lớp</h3>
+        <p class="small" style="margin-top:0">
+          Hoàn tất phiếu trước khi chốt đáp án. Giáo viên sẽ nhận được nhật ký phản xạ này.
+        </p>
+
+        <label class="field">
+          1. Từ hỏi
+          <select id="qtype">
+            <option value="">Chọn từ hỏi</option>
+            ${QTYPE_OPTIONS.map(o => `<option value="${o}" ${selected(o, ref.qtype)}>${o}</option>`).join("")}
+          </select>
+        </label>
+
+        <label class="field">
+          2. Loại thông tin cần tìm
+          <select id="infoType">
+            <option value="">Chọn loại thông tin</option>
+            ${INFO_TYPES.map(o => `<option value="${o}" ${selected(o, ref.infoType)}>${o}</option>`).join("")}
+          </select>
+        </label>
+
+        <label class="field">
+          3. Bằng chứng / Paraphrase
+          <input id="evidence" value="${escapeHtml(ref.evidence || "")}" placeholder="Gõ cụm từ khóa, 2–5 từ">
+        </label>
+
+        <label class="field">4. Đã kiểm tra đủ 4 lớp</label>
+        <div class="layers">
+          <label class="layer">
+            <input type="checkbox" data-layer="1" ${checked(ref.layers, "1")}>
+            <span><b>L1 Chủ thể</b><br>Ai thực hiện? Ai bị tác động?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="2" ${checked(ref.layers, "2")}>
+            <span><b>L2 Thời gian/Trạng thái</b><br>Đã xảy ra, đang xảy ra hay sẽ xảy ra?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="3" ${checked(ref.layers, "3")}>
+            <span><b>L3 Phạm vi/Mức độ</b><br>Some, most, all? May, always?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="4" ${checked(ref.layers, "4")}>
+            <span><b>L4 Mục đích câu hỏi</b><br>Đúng ý hỏi hay đúng nhưng lạc đề?</span>
+          </label>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  bindQuizEvents();
+  startTimer();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function bindQuizEvents(){
+  document.querySelectorAll(".option").forEach((el, idx) => {
+    el.addEventListener("click", () => selectOption(idx));
+  });
+
+  ["qtype", "infoType", "evidence"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", saveReflection);
+  });
+
+  document.querySelectorAll("[data-layer]").forEach(cb => {
+    cb.addEventListener("change", saveReflection);
+  });
+}
+
+function getReflectionFromDom(){
+  return {
+    qtype: document.getElementById("qtype")?.value || "",
+    infoType: document.getElementById("infoType")?.value || "",
+    evidence: (document.getElementById("evidence")?.value || "").trim(),
+    layers: Array.from(document.querySelectorAll("[data-layer]:checked")).map(el => el.dataset.layer)
+  };
+}
+
+function saveReflection(){
+  if (!state || !state.questions) return;
+  const q = state.questions[state.current];
+  if (!q) return;
+  state.reflections[q.id] = getReflectionFromDom();
+}
+
+function isReflectionComplete(ref){
+  return !!(
+    ref.qtype &&
+    ref.infoType &&
+    ref.evidence &&
+    ref.evidence.length >= 2 &&
+    Array.isArray(ref.layers) &&
+    ref.layers.length === 4
+  );
+}
+
+function selectOption(idx){
+  if (!state || state.answered) return;
+  const q = state.questions[state.current];
+  if (!q) return;
+
+  const ref = getReflectionFromDom();
+  state.reflections[q.id] = ref;
+
+  if (state.requireReflection && !isReflectionComplete(ref)){
+    if (!ref.qtype) showToast("Bước 1: chọn từ hỏi (Who/What/Why...)");
+    else if (!ref.infoType) showToast("Bước 2: chọn loại thông tin cần tìm");
+    else if (ref.evidence.length < 2) showToast("Bước 3: ghi cụm từ khóa/bằng chứng");
+    else showToast("Bước 4: đánh dấu đủ 4 lớp kiểm tra");
+    return;
+  }
+
+  const correct = idx === q.answer;
+  state.answered = true;
+  stopTimer();
+
+  const elapsed = Math.floor((Date.now() - state.qStart) / 1000);
+  const answer = {
+    qid: q.id,
+    selected: idx,
+    correct,
+    elapsed,
+    qtype: ref.qtype,
+    infoType: ref.infoType,
+    evidence: ref.evidence,
+    layers: ref.layers,
+    reflectionRequired: state.requireReflection,
+    reflectionDone: state.requireReflection ? true : null
+  };
+
+  state.answers.push(answer);
+  state.reflections[q.id] = ref;
+
+  document.querySelectorAll(".option").forEach((el, i) => {
+    el.disabled = true;
+    if (i === q.answer) el.classList.add("correct");
+    if (i === idx && !correct) el.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("feedback");
+  fb.className = "feedback " + (correct ? "ok" : "bad");
+  fb.innerHTML = renderFeedback(q, correct);
+
+  document.getElementById("nextActions").innerHTML = `
+    <button class="btn primary" onclick="nextQuestion()">
+      ${state.current === state.questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo"}
+    </button>
+  `;
+
+  document.querySelectorAll("#reflectionPanel input, #reflectionPanel select").forEach(el => el.disabled = true);
+
+  const progress = document.querySelector(".progress > div");
+  if (progress) progress.style.width = `${((state.current + 1) / state.questions.length) * 100}%`;
+}
+
+function renderFeedback(q, correct){
+  const correctLetter = String.fromCharCode(65 + q.answer);
+  return `
+    <div class="fb-title">${correct ? "✓ Chính xác" : "✗ Chưa đúng"}</div>
+    <p><strong>Đáp án đúng:</strong> ${correctLetter}. ${escapeHtml(q.options[q.answer])}</p>
+    <p><strong>Bằng chứng:</strong> “${escapeHtml(q.evidence)}”</p>
+    <p><strong>Bẫy:</strong> ${escapeHtml(q.traps.join(" • "))}</p>
+    <p><strong>Loại trừ:</strong> ${escapeHtml(q.elimination)}</p>
+    <p><strong>Chiến lược:</strong> ${escapeHtml(q.strategy)}</p>
+    <p><strong>Lớp quyết định:</strong> ${escapeHtml(q.layerFocus)}</p>
+  `;
+}
+
+function nextQuestion(){
+  if (!state) return;
+  stopTimer();
+  if (state.current >= state.questions.length - 1){
+    finishQuiz();
+    return;
+  }
+  state.current++;
+  state.answered = false;
+  renderQuiz();
+}
+
+/* =========================================================
+   9. TÍNH TOÁN & KẾT QUẢ HỌC SINH
+   ========================================================= */
+function computeStats(result){
+  const stats = {
+    byDiff: {},
+    byTrap: {},
+    byTheme: {},
+    reflectionReq: 0,
+    reflectionDone: 0
+  };
+
+  (result.answers || []).forEach(a => {
+    const q = QMAP[a.qid];
+    if (!q) return;
+
+    const d = q.diff || "Khác";
+    stats.byDiff[d] = stats.byDiff[d] || { total: 0, correct: 0 };
+    stats.byDiff[d].total++;
+    if (a.correct) stats.byDiff[d].correct++;
+
+    const t = q.theme || "Khác";
+    stats.byTheme[t] = stats.byTheme[t] || { total: 0, correct: 0 };
+    stats.byTheme[t].total++;
+    if (a.correct) stats.byTheme[t].correct++;
+
+    (q.traps || []).forEach(trap => {
+      stats.byTrap[trap] = stats.byTrap[trap] || { total: 0, wrong: 0 };
+      stats.byTrap[trap].total++;
+      if (!a.correct) stats.byTrap[trap].wrong++;
+    });
+
+    if (a.reflectionRequired){
+      stats.reflectionReq++;
+      if (a.reflectionDone) stats.reflectionDone++;
+    }
+  });
+
+  return stats;
+}
+
+function miniStat(label, total, correct){
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  return `
+    <div class="mini-stat">
+      <div><span>${escapeHtml(label)}</span><strong>${pct}%</strong></div>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="small">${correct}/${total} câu</div>
+    </div>
+  `;
+}
+
+function finishQuiz(){
+  stopTimer();
+  if (!state) return;
+  state.finished = true;
+
+  const total = state.questions.length;
+  const correctCount = state.answers.filter(a => a.correct).length;
+  const durationSec = state.answers.reduce((sum, a) => sum + (a.elapsed || 0), 0);
+
+  const result = {
+    id: "r_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+    student: state.student,
+    className: state.className,
+    mode: state.mode,
+    modeLabel: state.modeLabel,
+    dateISO: new Date().toISOString(),
+    score: correctCount,
+    total,
+    percent: total ? Math.round(correctCount / total * 100) : 0,
+    durationSec,
+    answers: state.answers.slice()
+  };
+
+  result.code = encodeResult(result);
+  lastResult = result;
+  saveResult(result);
+  renderResult(result);
+}
+
+function renderResult(r){
+  const answers = r.answers || [];
+  const wrong = answers.filter(a => !a.correct);
+  const score = Number(r.score) || 0;
+  const total = Number(r.total) || answers.length || 1;
+  const percent = Number(r.percent) || Math.round(score / total * 100);
+  const stats = computeStats(r);
+
+  const diffHtml = Object.entries(stats.byDiff)
+    .map(([d, v]) => miniStat(d, v.total, v.correct))
+    .join("");
+
+  const trapRows = Object.entries(stats.byTrap)
+    .sort((a, b) => b[1].wrong - a[1].wrong)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.wrong}/${v.total}</td>
+        <td>${v.total ? Math.round((v.total - v.wrong) / v.total * 100) : 0}%</td>
+      </tr>
+    `).join("");
+
+  const themeRows = Object.entries(stats.byTheme)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.correct}/${v.total}</td>
+        <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+      </tr>
+    `).join("");
+
+  const wrongRows = wrong.map(a => {
+    const q = QMAP[a.qid];
+    if (!q) return `<tr><td>${escapeHtml(a.qid)}</td><td colspan="4">Không tìm thấy dữ liệu câu hỏi.</td></tr>`;
+    return `
+      <tr>
+        <td>${escapeHtml(q.id)}</td>
+        <td>${escapeHtml(q.question)}</td>
+        <td>${String.fromCharCode(65 + a.selected)}.</td>
+        <td>${String.fromCharCode(65 + q.answer)}. ${escapeHtml(q.options[q.answer])}</td>
+        <td>${escapeHtml(q.traps.join(", "))}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const reflectionRows = answers.map(a => `
+    <tr>
+      <td>${escapeHtml(a.qid)}</td>
+      <td>${escapeHtml(a.qtype || "—")}</td>
+      <td>${escapeHtml(a.infoType || "—")}</td>
+      <td>${escapeHtml(a.evidence || "—")}</td>
+      <td>${Array.isArray(a.layers) ? a.layers.length : 0}/4</td>
+    </tr>
+  `).join("");
+
+  const code = r.code || encodeResult(r);
+  const reflPct = stats.reflectionReq
+    ? Math.round(stats.reflectionDone / stats.reflectionReq * 100)
+    : null;
+
+  app.innerHTML = `
+    <section class="result-header">
+      <div>
+        <div class="eyebrow">Phiếu kết quả</div>
+        <h1 style="margin:8px 0 6px">${escapeHtml(r.student || "Học sinh")}</h1>
+        <p class="small">
+          ${escapeHtml(r.className || "Chưa rõ")} ·
+          ${escapeHtml(r.modeLabel || MODE_LABELS[r.mode] || r.mode)} ·
+          ${escapeHtml(formatDate(r.dateISO))}
+        </p>
+      </div>
+      <div class="score-badge ${percent >= 80 ? "pass" : "fail"}">
+        <span>${percent}%</span>
+        <small>${score}/${total} câu</small>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <button class="btn primary" onclick="showSetup()">Làm lại</button>
+        ${wrong.length ? `<button class="btn ghost" onclick="startRetestFromResult()">Tái kiểm tra theo bẫy sai</button>` : ""}
+        <button class="btn ghost" onclick="startRetest7FromResult()">Ôn 7 ngày</button>
+        <button class="btn ghost" onclick="startPersonalFromResult()">Dọn lỗi cá nhân</button>
+        <button class="btn ghost" onclick="downloadLastResult()">Tải JSON</button>
+        <button class="btn ghost" onclick="copyLastResult()">Sao chép mã</button>
+        <button class="btn ghost" onclick="window.print()">In phiếu</button>
+        <button class="btn ghost" onclick="showTeacher()">Báo cáo giáo viên</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span>Điểm</span><strong>${percent}%</strong></div>
+        <div class="stat"><span>Đúng</span><strong>${score}/${total}</strong></div>
+        <div class="stat"><span>Thời gian</span><strong>${formatTime(r.durationSec || 0)}</strong></div>
+        <div class="stat">
+          <span>Phiếu phản xạ</span>
+          <strong>${reflPct == null ? "—" : reflPct + "%"}</strong>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:8px">Theo độ khó</h3>
+      ${diffHtml || `<p class="small">Chưa có dữ liệu.</p>`}
+
+      <details>
+        <summary>Xem theo chủ đề</summary>
+        <div class="table-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>Chủ đề</th><th>Đúng/Tổng</th><th>%</th></tr></thead>
+            <tbody>${themeRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Câu chưa đạt</h2>
+      ${wrong.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã câu</th>
+                <th>Câu hỏi</th>
+                <th>Chọn</th>
+                <th>Đúng</th>
+                <th>Bẫy</th>
+              </tr>
+            </thead>
+            <tbody>${wrongRows}</tbody>
+          </table>
+        </div>
+      ` : `<div class="empty">Không có câu sai. Xuất sắc!</div>`}
+
+      <details>
+        <summary>Nhật ký phản xạ (${answers.length} câu)</summary>
+        <div class="table-wrap" style="margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã câu</th>
+                <th>Từ hỏi</th>
+                <th>Loại thông tin</th>
+                <th>Bằng chứng</th>
+                <th>4 lớp</th>
+              </tr>
+            </thead>
+            <tbody>${reflectionRows || `<tr><td colspan="5" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Gửi kết quả cho giáo viên</h2>
+      <p class="small">
+        Học sinh sao chép mã dưới đây và gửi giáo viên qua Zalo/Google Classroom/email.
+        Giáo viên mở <b>Báo cáo giáo viên → Nhập mã kết quả</b>.
+      </p>
+      <textarea class="code-area" id="resultCode" readonly>${escapeHtml(code)}</textarea>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn primary" onclick="copyText(document.getElementById('resultCode').value)">Sao chép mã</button>
+        <button class="btn ghost" onclick="downloadLastResult()">Tải file JSON</button>
+      </div>
+      <p class="small">
+        Lưu ý: mã chứa họ tên/lớp. Chỉ gửi cho giáo viên, không đăng công khai.
+      </p>
+    </section>
+  `;
+}
+
+/* =========================================================
+   10. TÁI KIỂM TRA / LUYỆN THÊM TỪ KẾT QUẢ
+   ========================================================= */
+function startRetestFromResult(){
+  if (!lastResult) return;
+  const wrong = (lastResult.answers || []).filter(a => !a.correct);
+  const wrongQs = wrong.map(a => QMAP[a.qid]).filter(Boolean);
+  const traps = new Set(wrongQs.flatMap(q => q.traps || []));
+
+  let set = RETEST_24H.filter(q => (q.traps || []).some(t => traps.has(t)));
+  if (set.length === 0) set = RETEST_24H.slice();
+
+  beginQuiz({
+    mode: "retest24",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true,
+    questions: set
+  });
+}
+
+function startRetest7FromResult(){
+  if (!lastResult) return;
+  beginQuiz({
+    mode: "retest7",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true
+  });
+}
+
+function startPersonalFromResult(){
+  if (!lastResult) return;
+  beginQuiz({
+    mode: "personal",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true
+  });
+}
+
+function downloadLastResult(){
+  if (lastResult) downloadResult(lastResult);
+}
+
+function copyLastResult(){
+  if (lastResult) copyText(lastResult.code || encodeResult(lastResult));
+}
+
+function downloadResult(r){
+  if (!r) return;
+  const blob = new Blob([JSON.stringify(r, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  const safeName = String(r.student || "hoc-sinh").replace(/\s+/g, "-");
+  a.href = URL.createObjectURL(blob);
+  a.download = `ket-qua-${safeName}-${r.id || "result"}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast("Đã tải JSON");
+}
+
+/* =========================================================
+   11. BÁO CÁO GIÁO VIÊN
+   ========================================================= */
+function aggregateResults(results){
+  const stats = {
+    attempts: results.length,
+    totalPercent: 0,
+    passCount: 0,
+    avg: 0,
+    passRate: 0,
+    traps: {},
+    questions: {},
+    themes: {},
+    reflectionReq: 0,
+    reflectionDone: 0
+  };
+
+  results.forEach(r => {
+    const pct = Number(r.percent) || 0;
+    stats.totalPercent += pct;
+    if (pct >= 80) stats.passCount++;
+
+    (r.answers || []).forEach(a => {
+      const q = QMAP[a.qid];
+      if (!q) return;
+
+      const qt = stats.questions[a.qid] || { total: 0, correct: 0, diff: q.diff, theme: q.theme };
+      qt.total++;
+      if (a.correct) qt.correct++;
+      stats.questions[a.qid] = qt;
+
+      const th = stats.themes[q.theme] || { total: 0, correct: 0 };
+      th.total++;
+      if (a.correct) th.correct++;
+      stats.themes[q.theme] = th;
+
+      (q.traps || []).forEach(trap => {
+        const tr = stats.traps[trap] || { total: 0, wrong: 0 };
+        tr.total++;
+        if (!a.correct) tr.wrong++;
+        stats.traps[trap] = tr;
+      });
+
+      if (a.reflectionRequired){
+        stats.reflectionReq++;
+        if (a.reflectionDone) stats.reflectionDone++;
+      }
+    });
+  });
+
+  stats.avg = results.length ? Math.round(stats.totalPercent / results.length) : 0;
+  stats.passRate = results.length ? Math.round(stats.passCount / results.length * 100) : 0;
+  return stats;
+}
+
+function showTeacher(){
+  if (state && !state.finished && state.answers && state.answers.length > 0){
+    if (!confirm("Bạn đang làm dở. Vẫn mở báo cáo giáo viên?")) return;
+  }
+  stopTimer();
+  renderTeacher();
+}
+
+function renderTeacher(){
+  stopTimer();
+  const all = getResults();
+  const classes = [...new Set(all.map(r => r.className || "Chưa rõ"))]
+    .sort((a, b) => a.localeCompare(b, "vi"));
+
+  if (teacherClass && !classes.includes(teacherClass)) teacherClass = "";
+
+  const filtered = all.filter(r => !teacherClass || (r.className || "Chưa rõ") === teacherClass);
+  const rows = filtered.slice().sort((a, b) => new Date(b.dateISO || 0) - new Date(a.dateISO || 0));
+  teacherFiltered = rows;
+
+  const stats = aggregateResults(rows);
+
+  const classOptions = `<option value="">Tất cả lớp</option>` + classes.map(c => `
+    <option value="${escapeHtml(c)}" ${teacherClass === c ? "selected" : ""}>${escapeHtml(c)}</option>
+  `).join("");
+
+  const rowsHtml = rows.map((r, i) => {
+    const total = Number(r.total) || (r.answers || []).length || 0;
+    const score = Number(r.score) || 0;
+    const wrong = Math.max(0, total - score);
+    const req = (r.answers || []).filter(a => a.reflectionRequired).length;
+    const done = (r.answers || []).filter(a => a.reflectionRequired && a.reflectionDone).length;
+    const refl = req ? `${done}/${req}` : "—";
+
+    return `
+      <tr>
+        <td>${escapeHtml(formatDate(r.dateISO))}</td>
+        <td>${escapeHtml(r.student || "—")}</td>
+        <td>${escapeHtml(r.className || "—")}</td>
+        <td>${escapeHtml(r.modeLabel || MODE_LABELS[r.mode] || r.mode)}</td>
+        <td>${Number(r.percent) || 0}%</td>
+        <td>${score}/${total}</td>
+        <td>${formatTime(Number(r.durationSec) || 0)}</td>
+        <td>${wrong}</td>
+        <td>${refl}</td>
+        <td><button class="btn small ghost" onclick="copyResultByIndex(${i})">Sao chép mã</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  const trapRows = Object.entries(stats.traps)
+    .sort((a, b) => b[1].wrong - a[1].wrong)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.wrong}/${v.total}</td>
+        <td>${v.total ? Math.round((v.total - v.wrong) / v.total * 100) : 0}%</td>
+      </tr>
+    `).join("");
+
+  const qRows = Object.entries(stats.questions)
+    .sort((a, b) => (a[1].correct / (a[1].total || 1)) - (b[1].correct / (b[1].total || 1)))
+    .map(([id, v]) => {
+      const q = QMAP[id];
+      return `
+        <tr>
+          <td>${escapeHtml(id)}</td>
+          <td>${escapeHtml(q ? q.question : "—")}</td>
+          <td>${escapeHtml(q ? q.diff : "—")}</td>
+          <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+          <td>${v.correct}/${v.total}</td>
+        </tr>
+      `;
+    }).join("");
+
+  const themeRows = Object.entries(stats.themes)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.correct}/${v.total}</td>
+        <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+      </tr>
+    `).join("");
+
+  const reflectionPct = stats.reflectionReq
+    ? Math.round(stats.reflectionDone / stats.reflectionReq * 100)
+    : null;
+
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Bảng điều khiển giáo viên</div>
+        <h1>Kết quả lớp học</h1>
+        <p>
+          Tổng hợp theo học sinh, độ khó, chủ đề và loại bẫy.
+          Học sinh gửi mã kết quả; giáo viên dán mã để nhập vào báo cáo.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>Ngưỡng đạt gợi ý</strong>
+        <p>≥80% và không lặp lại bẫy cá nhân. Câu sai sẽ tự động nằm trong danh sách tái kiểm tra.</p>
+        <span class="small">Có thể xuất CSV hoặc in báo cáo lớp.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <label style="font-weight:800;margin-right:8px">Lọc lớp:
+          <select id="classFilter" onchange="setTeacherClass(this.value)" style="display:inline-block;width:auto;margin-left:8px">
+            ${classOptions}
+          </select>
+        </label>
+        <button class="btn ghost" onclick="renderTeacher()">Làm mới</button>
+        <button class="btn ghost" onclick="exportCSV()">Xuất CSV</button>
+        <button class="btn ghost" onclick="window.print()">In báo cáo</button>
+        <button class="btn ghost" onclick="clearResults()">Xóa dữ liệu</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span>Lượt làm</span><strong>${stats.attempts}</strong></div>
+        <div class="stat"><span>Điểm trung bình</span><strong>${stats.avg}%</strong></div>
+        <div class="stat"><span>Tỷ lệ đạt</span><strong>${stats.passRate}%</strong></div>
+        <div class="stat">
+          <span>Phiếu phản xạ</span>
+          <strong>${reflectionPct == null ? "—" : reflectionPct + "%"}</strong>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Học sinh</th>
+              <th>Lớp</th>
+              <th>Chế độ</th>
+              <th>%</th>
+              <th>Điểm</th>
+              <th>Thời gian</th>
+              <th>Sai</th>
+              <th>Phiếu</th>
+              <th>Mã</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || `<tr><td colspan="10" class="empty">Chưa có kết quả. Học sinh làm bài rồi gửi mã cho giáo viên.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Phổ bẫy yếu của lớp</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Loại bẫy</th><th>Sai/Tổng cơ hội</th><th>Độ chính xác</th></tr></thead>
+          <tbody>
+            ${trapRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Câu hỏi cần dạy lại</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Mã câu</th><th>Câu hỏi</th><th>Độ khó</th><th>%</th><th>Đúng/Tổng</th></tr>
+          </thead>
+          <tbody>
+            ${qRows || `<tr><td colspan="5" class="empty">Chưa có dữ liệu.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Theo chủ đề</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Chủ đề</th><th>Đúng/Tổng</th><th>%</th></tr></thead>
+          <tbody>${themeRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Nhập mã kết quả từ học sinh</h2>
+      <p class="small">
+        Học sinh bấm “Sao chép mã” ở phiếu kết quả và gửi cho giáo viên.
+        Dán mã bắt đầu bằng <b>PHX1.</b> vào ô dưới.
+      </p>
+      <textarea class="code-area" id="importCode" placeholder="Dán mã PHX1..."></textarea>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn primary" onclick="importResult()">Nhập mã kết quả</button>
+      </div>
+      <p class="small">
+        Nếu cùng một trình duyệt/máy, kết quả tự lưu và đã xuất hiện trong bảng trên.
+      </p>
+    </section>
+  `;
+}
+
+function setTeacherClass(v){
+  teacherClass = v;
+  renderTeacher();
+}
+
+function copyResultByIndex(i){
+  const r = teacherFiltered[i];
+  if (!r) return;
+  copyText(r.code || encodeResult(r));
+}
+
+function importResult(){
+  const ta = document.getElementById("importCode");
+  if (!ta) return;
+  const code = ta.value.trim();
+  if (!code){ showToast("Chưa có mã để nhập"); return; }
+
+  try {
+    const obj = decodeResult(code);
+    obj.id = obj.id || "imp_" + Date.now();
+    obj.code = code;
+
+    const arr = getResults();
+    const idx = arr.findIndex(x => x.id === obj.id);
+    if (idx >= 0) arr[idx] = obj;
+    else arr.push(obj);
+
+    saveResults(arr);
+    ta.value = "";
+    renderTeacher();
+    showToast("Đã nhập kết quả");
+  } catch(e){
+    showToast("Mã kết quả không hợp lệ");
+  }
+}
+
+function exportCSV(){
+  const data = teacherFiltered.length ? teacherFiltered : getResults();
+  const rows = [
+    ["Mã", "Ngày", "Học sinh", "Lớp", "Chế độ", "Điểm", "Tổng", "%", "Thời gian(s)", "Sai", "Phiếu phản xạ"]
+  ];
+
+  data.forEach(r => {
+    const total = Number(r.total) || (r.answers || []).length || 0;
+    const score = Number(r.score) || 0;
+    const req = (r.answers || []).filter(a => a.reflectionRequired).length;
+    const done = (r.answers || []).filter(a => a.reflectionRequired && a.reflectionDone).length;
+    rows.push([
+      r.id || "",
+      formatDate(r.dateISO),
+      r.student || "",
+      r.className || "",
+      r.modeLabel || MODE_LABELS[r.mode] || r.mode || "",
+      score,
+      total,
+      Number(r.percent) || 0,
+      Number(r.durationSec) || 0,
+      Math.max(0, total - score),
+      req ? `${done}/${req}` : "—"
+    ]);
+  });
+
+  const csv = rows.map(row =>
+    row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
+  ).join("\n");
+
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `bao-cao-phan-xa-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast("Đã xuất CSV");
+}
+
+function clearResults(){
+  if (!confirm("Xóa toàn bộ kết quả đã lưu trên trình duyệt này?")) return;
+  try { localStorage.removeItem(LS_KEY); } catch(e){}
+  memoryResults = [];
+  teacherClass = "";
+  renderTeacher();
+  showToast("Đã xóa dữ liệu");
+}
+
+/* =========================================================
+   12. ĐIỀU HƯỚNG & KHỞI TẠO
+   ========================================================= */
+function showSetup(){
+  if (state && !state.finished && state.answers && state.answers.length > 0){
+    if (!confirm("Bạn đang làm dở. Về màn hình bắt đầu sẽ mất tiến độ. Tiếp tục?")) return;
+  }
+  stopTimer();
+  state = { finished: true };
+  renderSetup();
+}
+
+function stopTimer(){
+  if (state && state.timerId){
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function startTimer(){
+  stopTimer();
+  state.qStart = Date.now();
+  updateTimer();
+  state.timerId = setInterval(updateTimer, 1000);
+}
+
+function updateTimer(){
+  if (!state || !state.qStart) return;
+  const sec = Math.floor((Date.now() - state.qStart) / 1000);
+  const el = document.getElementById("timer");
+  if (el) el.textContent = formatTime(sec);
+}
+
+/* Khởi chạy */
+renderSetup();
+function exportPDF(){
+  document.body.classList.add('print-result');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('print-result'),500);
+}
+</script>
+</body>
+</html<div class="card" id="resultCard">html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phản xạ đọc hiểu 4 lớp</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#667085; --line:#e4e7ec;
+  --primary:#3157d5; --primary2:#6d4aff; --green:#0e9f6e; --green-bg:#e8f8f1;
+  --red:#d92d20; --red-bg:#fef3f2; --amber:#b54708; --amber-bg:#fffaeb;
+  --blue-bg:#eef4ff; --radius:18px; --shadow:0 12px 30px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:16px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 20px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:.02em;flex:0 0 auto}
+.brand strong{display:block;font-size:15px;line-height:1.2}
+.brand span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav-btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:11px;padding:9px 13px;font-weight:700;font-size:14px}
+.nav-btn:hover{border-color:#b9c7f5;background:#f8faff}
+.app{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;align-items:center;margin-bottom:18px}
+.hero h1{margin:6px 0 10px;font-size:38px;line-height:1.12;letter-spacing:-.03em}
+.hero p{margin:0;color:var(--muted);line-height:1.65;max-width:720px}
+.eyebrow{display:inline-flex;background:var(--blue-bg);color:var(--primary);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.hero-card{background:linear-gradient(135deg,#eef4ff,#f7f4ff);border:1px solid #dfe7ff;border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.hero-card strong{font-size:18px}
+.hero-card p{color:#475467;font-size:14px;line-height:1.6;margin:8px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+label.field{display:block;margin:0 0 14px;font-weight:700;font-size:14px;color:#344054}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;color:var(--text);outline:none;margin-top:6px}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,87,213,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;border:1px solid transparent;font-weight:800;text-decoration:none}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:0}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--text)}
+.btn.small{padding:7px 10px;border-radius:9px;font-size:12px}
+.btn:hover{filter:brightness(.98)}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-weight:400;color:var(--text)}
+.check input{width:18px;height:18px;margin-top:2px;flex:0 0 auto}
+.step{background:#f9fafc;border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:8px 0}
+.step b{font-size:14px}
+.step p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.quiz-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:18px;align-items:start}
+.quiz-head{margin-bottom:14px}
+.progress{height:8px;background:#e9edf5;border-radius:99px;overflow:hidden;margin-bottom:10px}
+.progress > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:99px;transition:width .25s}
+.quiz-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tag{display:inline-flex;align-items:center;background:#f4f6fa;color:#475467;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+.tag.easy{background:var(--green-bg);color:var(--green)}
+.tag.medium{background:var(--amber-bg);color:var(--amber)}
+.tag.hard{background:var(--red-bg);color:var(--red)}
+.tag.retest{background:#f4f0ff;color:#6d4aff}
+.passage{background:#f8faff;border:1px solid #e8eefc;border-radius:14px;padding:16px;line-height:1.65;margin-bottom:18px}
+.question-card h2{font-size:22px;line-height:1.35;margin:0 0 16px}
+.options{display:grid;gap:10px}
+.option{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;transition:.15s;color:var(--text)}
+.option:hover{border-color:#b9c7f5;background:#f9fbff;transform:translateY(-1px)}
+.option .letter{flex:0 0 28px;height:28px;border-radius:9px;background:#eef2ff;color:#3157d5;display:grid;place-items:center;font-weight:800;font-size:13px}
+.option.correct{border-color:var(--green);background:var(--green-bg)}
+.option.correct .letter{background:var(--green);color:#fff}
+.option.wrong{border-color:var(--red);background:var(--red-bg)}
+.option.wrong .letter{background:var(--red);color:#fff}
+.option:disabled{opacity:1;cursor:default}
+.reflection-card{position:sticky;top:88px}
+.reflection-card h3{margin-top:0}
+.reflection-card .field{margin-bottom:12px;font-size:13px}
+.layers{display:grid;gap:8px;margin-top:8px}
+.layer{display:flex;gap:10px;align-items:flex-start;background:#f9fafc;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:400}
+.layer input{width:16px;height:16px;margin-top:2px}
+.feedback{border-radius:14px;padding:16px;margin-top:16px;border:1px solid var(--line);background:#f9fafc}
+.feedback.ok{background:var(--green-bg);border-color:#b9e7d4}
+.feedback.bad{background:var(--red-bg);border-color:#f3b8b3}
+.fb-title{font-weight:900;font-size:17px;margin-bottom:10px}
+.feedback p{margin:7px 0;line-height:1.55}
+.next-actions{margin-top:16px;display:flex;justify-content:flex-end}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat{background:#f9fafc;border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+.stat strong{font-size:24px}
+.score-badge{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:150px;height:150px;border-radius:50%;background:#eef4ff;border:6px solid #fff;box-shadow:var(--shadow)}
+.score-badge.pass{background:var(--green-bg);color:var(--green)}
+.score-badge.fail{background:var(--red-bg);color:var(--red)}
+.score-badge span{font-size:34px;font-weight:900}
+.score-badge small{font-size:13px}
+.result-header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:18px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f8fafc;color:#475467;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.mini-stat{margin:10px 0}
+.mini-stat > div:first-child{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:5px}
+.bar{height:7px;background:#e9edf5;border-radius:99px;overflow:hidden}
+.bar > div{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2))}
+.small{color:var(--muted);font-size:12px}
+.code-area{width:100%;min-height:90px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+details{margin-top:12px}
+summary{cursor:pointer;font-weight:800;color:var(--primary)}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#172033;color:#fff;padding:11px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){
+  .hero,.grid-2,.quiz-grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .reflection-card{position:static}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .result-header{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:560px){
+  .app{padding:16px 10px 40px}
+  .card{padding:16px}
+  .topbar{padding:10px 12px}
+  .brand span{display:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .score-badge{width:120px;height:120px}
+  .option{padding:11px}
+}
+@media print{
+  body{background:#fff}
+  .topbar,.toolbar,.btn,.toast{display:none!important}
+  .card{box-shadow:none;border-color:#ddd;break-inside:avoid}
+  .app{max-width:none;padding:0}
+  .table-wrap{overflow:visible}
+}
+.hidden{display:none}
+@media print{
+  body.print-result *{visibility:hidden}
+  body.print-result #resultCard, body.print-result #resultCard *{visibility:visible}
+  body.print-result #resultCard{position:absolute;left:0;top:0;width:100%;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">4L</div>
+    <div>
+      <strong>Phản xạ đọc hiểu</strong>
+      <span>Học sinh luyện – Giáo viên nhận báo cáo</span>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="showSetup()">Luyện tập</button>
+    <button class="nav-btn" onclick="showTeacher()">Báo cáo giáo viên</button>
+  </nav>
+</header>
+
+<main class="app" id="app"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+const app = document.getElementById("app");
+
+/* =========================================================
+   1. DỮ LIỆU 20 CÂU CHUẨN
+   ========================================================= */
+const QUESTION_BANK = [
+  {
+    id:"10_FL_01", theme:"Family Life & Daily Routines", diff:"Dễ", target:45,
+    passage:"In Mr. Brown’s family, both parents share housework equally. Every evening, Mr. Brown cooks dinner while his wife cleans the living room. Their children, Tom and Anna, help by washing the dishes after meals. This routine helps them build a strong family bond.",
+    question:"What do Tom and Anna do in the family routine?",
+    options:[
+      "They cook dinner every evening.",
+      "They clean the living room with their mother.",
+      "They wash the dishes after meals.",
+      "They share all housework equally with their parents."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"children, Tom and Anna, help by washing the dishes",
+    traps:["Đảo chủ thể","Chi tiết lạc đề"],
+    elimination:"A sai vì Mr. Brown nấu ăn. B sai vì vợ ông Brown dọn phòng khách. D sai vì bố mẹ chia việc nhà, còn hai con chỉ giúp rửa bát.",
+    strategy:"Quét từ khóa 'Tom and Anna', khoanh chủ thể, đối chiếu hành động chính xác.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_FL_02", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Teenagers often need about 8 to 10 hours of sleep each night to support their rapid physical growth. However, a recent survey shows that nearly 70% of high school students in the city sleep less than 7 hours because of heavy school workloads and late-night smartphone use.",
+    question:"According to the survey, why do most urban high school students sleep less than 7 hours?",
+    options:[
+      "Because they suffer from severe physical growth problems.",
+      "Because of heavy school workloads and using smartphones late at night.",
+      "Because they always prefer sleeping 8 to 10 hours a night.",
+      "Because school workloads prevent them from growing physically."
+    ],
+    answer:1,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"because of heavy school workloads and late-night smartphone use",
+    traps:["Đảo nguyên nhân–kết quả","Tuyệt đối hóa"],
+    elimination:"A đảo ngược nhân quả. C dùng 'always' tuyệt đối hóa và mâu thuẫn với việc ngủ ít. D sai ý so với bài.",
+    strategy:"Xác định 'why' → tìm cụm 'because of...' → kiểm tra 4 lớp.",
+    layerFocus:"L4 Mục đích/Nguyên nhân"
+  },
+  {
+    id:"10_FL_03", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Last weekend, Linda’s family planned to visit her grandparents in the countryside. Unfortunately, heavy rain forced them to cancel the trip. Instead, they stayed home and cooked a traditional meal together, which turned out to be a wonderful bonding experience.",
+    question:"What did Linda’s family actually do last weekend?",
+    options:[
+      "They successfully visited her grandparents in the countryside.",
+      "They traveled to the countryside despite the heavy rain.",
+      "They stayed at home and cooked a traditional meal together.",
+      "They had to cancel all their weekend plans without doing anything."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"Instead, they stayed home and cooked a traditional meal together",
+    traps:["Đảo thời gian","Sự kiện trái ngược"],
+    elimination:"A, B nhắc kế hoạch ban đầu nhưng đã bị hủy do mưa. D sai vì họ vẫn ở nhà nấu ăn cùng nhau, không phải 'không làm gì'.",
+    strategy:"Lưu ý từ chuyển ý 'Instead' (thay vào đó) để bắt sự kiện thực tế.",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_FL_04", theme:"Family Life & Daily Routines", diff:"Khó", target:75,
+    passage:"Although many parents believe that pocket money teaches children financial independence, some experts argue that giving too much cash without guidance may lead to bad spending habits and weaken responsibility.",
+    question:"What is the experts' view on giving children pocket money?",
+    options:[
+      "It always guarantees that children will become financially independent.",
+      "It never causes any negative effects if given in large amounts.",
+      "It may result in poor spending habits if children receive too much without proper guidance.",
+      "It completely destroys children's sense of responsibility in all cases."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"may lead to bad spending habits and weaken responsibility... without guidance",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'always' sai mức độ so với 'may'. B dùng 'never' trái ngược với ý cảnh báo. D dùng 'completely... in all cases' là tuyệt đối hóa phạm vi.",
+    strategy:"Chú ý từ chỉ mức độ/khả năng (may, might, can) để loại đáp án tuyệt đối (always, never, all).",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_FL_05", theme:"Family Life & Daily Routines", diff:"Trung bình", target:60,
+    passage:"Sharing housework helps children develop essential life skills. When children take part in cooking or cleaning, they learn how to take care of themselves when they live independently in the future.",
+    question:"What is the primary benefit of sharing housework for children mentioned in the text?",
+    options:[
+      "It helps them earn extra pocket money from their parents.",
+      "It teaches them essential life skills for future independent living.",
+      "It ensures they never have to do chores when they grow up.",
+      "It allows them to finish schoolwork much faster every day."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"help children develop essential life skills... live independently in the future",
+    traps:["Chi tiết ngoài bài"],
+    elimination:"A, D không xuất hiện trong đoạn. C mâu thuẫn với việc học kỹ năng tự lập để tự lo sau này.",
+    strategy:"Đối chiếu câu hỏi 'primary benefit' với câu chủ đề của đoạn.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_HE_01", theme:"Humans & Environment / Green Living", diff:"Dễ", target:45,
+    passage:"Green living involves making lifestyle choices that protect the environment. A simple way to start is by reducing plastic waste. Many local stores now offer reusable bags instead of single-use plastic bags to shoppers.",
+    question:"What are local stores doing to help reduce plastic waste?",
+    options:[
+      "They are banning shoppers from entering stores.",
+      "They are offering reusable bags instead of single-use plastic bags.",
+      "They are forcing shoppers to buy plastic bags every day.",
+      "They are producing single-use plastic bags for customers."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"offer reusable bags instead of single-use plastic bags",
+    traps:["Đảo ngược thông tin","Trái nghĩa"],
+    elimination:"A, C, D bịa đặt hoặc đảo ngược việc cửa hàng cung cấp túi tái sử dụng thay túi nhựa dùng một lần.",
+    strategy:"Quét 'local stores' → đọc kỹ cụm 'instead of'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_HE_02", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"In an effort to reduce carbon footprints, the local government announced that all public buses will switch from diesel to electric power by next year. Currently, engineers are testing the new charging stations across the city.",
+    question:"What is the current status of the public buses according to the text?",
+    options:[
+      "They have already completed the switch to electric power.",
+      "They are currently running entirely on diesel power while engineers test charging stations.",
+      "They will stop operating completely until next year.",
+      "They are being manufactured by engineers in the city center."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"will switch... by next year. Currently, engineers are testing...",
+    traps:["Đảo thời gian"],
+    elimination:"A sai thì (tương lai vs đã hoàn thành). C không có thông tin ngừng hoạt động. D sai chi tiết (kỹ sư kiểm tra trạm sạc, không sản xuất xe).",
+    strategy:"Kiểm tra L2: phân biệt 'by next year' (tương lai) và 'Currently' (hiện tại).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_HE_03", theme:"Humans & Environment / Green Living", diff:"Khó", target:75,
+    passage:"Planting trees in urban areas is often praised as an effective way to lower temperatures. However, researchers note that trees only provide significant cooling benefits if they are mature and planted in large, continuous clusters rather than isolated spots.",
+    question:"Under what condition do urban trees provide significant cooling benefits?",
+    options:[
+      "If they are planted anywhere in isolated spots across the city.",
+      "Unless they are young saplings planted by local residents.",
+      "Only if they are mature and planted in large, continuous clusters.",
+      "Provided that the city temperature is extremely high."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Điều kiện",
+    evidence:"only provide significant cooling benefits if they are mature and planted in large, continuous clusters rather than isolated spots",
+    traps:["Đảo điều kiện","Trái nghĩa nội dung"],
+    elimination:"A trái với 'rather than isolated spots'. B dùng 'unless' và 'young saplings' sai điều kiện (bài: mature). D thêm điều kiện ngoài bài.",
+    strategy:"Nhận diện từ nối điều kiện (only if, if, unless) để tránh bẫy đảo điều kiện.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_HE_04", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"Eco-friendly packaging has become a major trend among supermarket chains. While some critics argue that it increases product prices, most consumers are willing to pay extra because they care deeply about ocean conservation.",
+    question:"Why are most consumers willing to pay extra for eco-friendly packaging?",
+    options:[
+      "Because prices at supermarkets have decreased significantly.",
+      "Because they care deeply about ocean conservation.",
+      "Because critics forced supermarkets to raise product prices.",
+      "Because they want to test new packaging trends."
+    ],
+    answer:1,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"because they care deeply about ocean conservation",
+    traps:["Đảo mục đích","Chi tiết lạc đề"],
+    elimination:"A mâu thuẫn (giá tăng). C sai chủ thể (nhà phê bình không ép người tiêu dùng). D không phải động lực chính.",
+    strategy:"Tìm 'because' đi kèm đối tượng 'consumers'.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_HE_05", theme:"Humans & Environment / Green Living", diff:"Trung bình", target:60,
+    passage:"Renewable energy sources like solar and wind power are expanding rapidly. In 2025, solar energy supplied nearly 30% of the total electricity in the region, making it the fastest-growing clean energy source.",
+    question:"What was true about solar energy in the region in 2025?",
+    options:[
+      "It supplied all the electricity needed by local residents.",
+      "It supplied nearly 30% of the total electricity and grew the fastest.",
+      "It was replaced entirely by wind power during the year.",
+      "It provided less electricity than any other energy source."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"supplied nearly 30% of the total electricity... fastest-growing",
+    traps:["Đảo phạm vi","Tuyệt đối hóa"],
+    elimination:"A dùng 'all' sai, bài chỉ 'nearly 30%'. C, D sai lệch hoàn toàn so với thông tin.",
+    strategy:"Kiểm tra L3: 'nearly 30%' không phải 'all'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_MA_01", theme:"Music, Arts & Community Development", diff:"Dễ", target:45,
+    passage:"Music plays an essential role in teenagers' emotional development. Listening to upbeat songs can boost their mood after a stressful school day, while calming melodies help them relax before bedtime.",
+    question:"What do calming melodies help teenagers do?",
+    options:[
+      "Boost their mood immediately after school.",
+      "Relax before bedtime.",
+      "Study for school exams more effectively.",
+      "Compose upbeat songs for their friends."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"calming melodies help them relax before bedtime",
+    traps:["Đảo thời điểm","Trộn lẫn chi tiết"],
+    elimination:"A là tác dụng của nhạc sôi động sau giờ học. C, D không được đề cập.",
+    strategy:"Phân tách hai vế câu để không nhầm công dụng của từng loại nhạc.",
+    layerFocus:"L1 Chủ thể / L2 Thời gian"
+  },
+  {
+    id:"10_MA_02", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Volunteering at local community centers gives students valuable hands-on experience. Instead of just learning theory in classrooms, teenagers can apply communication skills directly while helping elderly people or teaching underprivileged children.",
+    question:"How do students benefit from volunteering at community centers according to the text?",
+    options:[
+      "They only learn theoretical concepts from textbooks.",
+      "They gain valuable hands-on experience and practice communication skills.",
+      "They earn a high salary for teaching underprivileged children.",
+      "They avoid going to regular classrooms at school."
+    ],
+    answer:1,
+    qtype:"How", infoType:"Nguyên nhân/Mục đích",
+    evidence:"gives students valuable hands-on experience... apply communication skills directly",
+    traps:["Đảo ý nghĩa","Chi tiết lạc đề"],
+    elimination:"A bẫy 'theory' (bài nói thay vì chỉ học lý thuyết). C sai chi tiết (tình nguyện không nhận lương cao). D sai vì không bỏ học.",
+    strategy:"Đọc kỹ 'Instead of...' để nắm ý chính thực sự được khẳng định.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_MA_03", theme:"Music, Arts & Community Development", diff:"Khó", target:75,
+    passage:"The school art exhibition was organized by the student council last Friday. While teachers initially worried about low student turnout, over five hundred visitors attended the opening night, exceeding all expectations.",
+    question:"What was teachers' initial expectation regarding the art exhibition?",
+    options:[
+      "They expected over five hundred visitors to attend the opening night.",
+      "They worried that student turnout would be low.",
+      "They believed the student council would cancel the event.",
+      "They knew it would exceed all previous attendance records."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Thời gian/Trạng thái",
+    evidence:"teachers initially worried about low student turnout",
+    traps:["Đảo thời gian","Trạng thái"],
+    elimination:"A lấy số 500 khách (thực tế) gán làm kỳ vọng ban đầu. C không có thông tin. D ngược với lo lắng ít.",
+    strategy:"Phân biệt 'initial' (ban đầu - lo ít) và 'actual result' (thực tế - hơn 500 người).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"10_MA_04", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Traditional music forms, such as Quan Ho or Ca Tru, are facing the risk of disappearing as younger generations lean towards modern pop music. Cultural experts suggest that schools should introduce traditional folk songs into music lessons to preserve national heritage.",
+    question:"What do cultural experts suggest to preserve traditional music?",
+    options:[
+      "Ban modern pop music completely from schools.",
+      "Introduce traditional folk songs into school music lessons.",
+      "Require all teenagers to become professional folk singers.",
+      "Replace modern music with foreign songs in classrooms."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"schools should introduce traditional folk songs into music lessons",
+    traps:["Tuyệt đối hóa","Đảo ý lệch lạc"],
+    elimination:"A dùng 'completely ban' không có trong bài. C, D sai mục đích và nội dung đề xuất.",
+    strategy:"Quét 'cultural experts suggest' → đối chiếu hành động đề xuất.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"10_MA_05", theme:"Music, Arts & Community Development", diff:"Trung bình", target:60,
+    passage:"Participating in school music clubs helps students build confidence. When shy members perform on stage for the first time, they overcome their stage fright and learn how to express themselves effectively in public.",
+    question:"What happens when shy members perform on stage for the first time?",
+    options:[
+      "They lose their confidence permanently.",
+      "They overcome their stage fright and learn public expression.",
+      "They refuse to participate in any future club activities.",
+      "They become professional stage directors immediately."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"overcome their stage fright and learn how to express themselves effectively",
+    traps:["Trái nghĩa","Phóng đại"],
+    elimination:"A ngược nghĩa (mất tự tin vĩnh viễn). C, D phi thực tế, không có trong bài.",
+    strategy:"Kiểm tra từ khóa hành động 'overcome stage fright'.",
+    layerFocus:"L1 Chủ thể / L2 Trạng thái"
+  },
+  {
+    id:"10_IT_01", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Dễ", target:45,
+    passage:"Smartphones have revolutionized how students learn languages. With various translation apps and interactive flashcards, learners can practice vocabulary anywhere without carrying heavy dictionaries.",
+    question:"How do translation apps on smartphones help language learners?",
+    options:[
+      "They force learners to carry heavy dictionaries.",
+      "They allow learners to practice vocabulary anywhere without heavy dictionaries.",
+      "They make it impossible to learn new vocabulary outside of classrooms.",
+      "They replace human teachers completely in all schools."
+    ],
+    answer:1,
+    qtype:"How", infoType:"Hành động/Sự kiện",
+    evidence:"practice vocabulary anywhere without carrying heavy dictionaries",
+    traps:["Đảo ngược phủ định","Phóng đại"],
+    elimination:"A đảo 'without' thành 'force to carry'. C, D mâu thuẫn và phóng đại.",
+    strategy:"Chú ý giới từ phủ định (without, unlike, instead of).",
+    layerFocus:"L1 Chủ thể / L2 Phủ định"
+  },
+  {
+    id:"10_IT_02", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Online learning platforms offer great flexibility, but they require strong self-discipline. A study revealed that students who lack good time-management skills often fall behind in their coursework.",
+    question:"According to the study, which students tend to fall behind in online courses?",
+    options:[
+      "Those who possess excellent time-management skills.",
+      "Those who lack good time-management skills.",
+      "Those who spend too much time studying in traditional classrooms.",
+      "Those who always complete their coursework ahead of schedule."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Chủ thể",
+    evidence:"students who lack good time-management skills often fall behind",
+    traps:["Đảo tính chất đối lập"],
+    elimination:"A, D nói ngược đối tượng gặp khó khăn. C không liên quan đến học truyền thống.",
+    strategy:"Quét 'fall behind' → tìm chính xác đặc điểm 'lack good time-management'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"10_IT_03", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Khó", target:75,
+    passage:"Artificial Intelligence tools can assist teachers by grading multiple-choice quizzes automatically. However, human teachers are still irreplaceable when it comes to inspiring students and nurturing emotional intelligence.",
+    question:"What limitation of AI tools is implied in the text?",
+    options:[
+      "They can grade all types of assignments, including complex essays, just like humans.",
+      "They are completely unable to assist teachers with any classroom tasks.",
+      "They cannot replace human teachers in inspiring students and nurturing emotional intelligence.",
+      "They always cause teachers to lose their jobs immediately."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"human teachers are still irreplaceable when it comes to inspiring students and nurturing emotional intelligence",
+    traps:["Tuyệt đối hóa","Phóng đại"],
+    elimination:"A sai vì AI chỉ chấm trắc nghiệm. B sai vì AI có hỗ trợ. D dùng 'always... immediately' tuyệt đối hóa.",
+    strategy:"Phân tích ranh giới: AI làm được gì và không thay thế được gì.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"10_IT_04", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Maintaining a healthy lifestyle requires regular physical activity and a balanced diet. Nutritionists advise eating plenty of green vegetables while cutting down on processed sugars to prevent chronic illnesses.",
+    question:"What do nutritionists recommend to prevent chronic illnesses?",
+    options:[
+      "Eating plenty of green vegetables and reducing processed sugars.",
+      "Consuming more processed sugars and avoiding vegetables.",
+      "Exercising heavily without paying attention to daily diet.",
+      "Stopping all physical activities immediately."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"eating plenty of green vegetables while cutting down on processed sugars",
+    traps:["Đảo ngược thông tin","Đảo chiều tác động"],
+    elimination:"B nói ngược (tiêu thụ nhiều đường). C, D bỏ qua hoặc phủ định yếu tố cốt lõi.",
+    strategy:"Đối chiếu hành động kép: ăn rau xanh + giảm đường chế biến.",
+    layerFocus:"L1 Chủ thể / L3 Phạm vi"
+  },
+  {
+    id:"10_IT_05", theme:"Inventions, Technology & Healthy Lifestyle", diff:"Trung bình", target:60,
+    passage:"Regular exercise not only improves cardiovascular health but also reduces stress levels significantly. Walking briskly for thirty minutes a day can boost mental clarity and energy throughout the afternoon.",
+    question:"What is one of the mental benefits of brisk walking for thirty minutes a day?",
+    options:[
+      "It increases physical stress levels during the afternoon.",
+      "It boosts mental clarity and energy.",
+      "It causes severe fatigue right after exercising.",
+      "It destroys cardiovascular health over time."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"boost mental clarity and energy throughout the afternoon",
+    traps:["Trái nghĩa","Đảo chiều tác động"],
+    elimination:"A ngược nghĩa (giảm căng thẳng). C, D trái ngược lợi ích sức khỏe được nêu.",
+    strategy:"Kiểm tra từ khóa lợi ích tinh thần (mental clarity).",
+    layerFocus:"L4 Mục đích"
+  }
+];
+
+/* =========================================================
+   2. BỘ TÁI KIỂM TRA 24 GIỜ
+   ========================================================= */
+const RETEST_24H = [
+  {
+    id:"R24_01", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"The headmaster praised the voluntary group for their hard work.",
+    question:"Who praised whom?",
+    options:[
+      "The headmaster praised the voluntary group.",
+      "The voluntary group praised the headmaster.",
+      "The teachers praised both the headmaster and the group.",
+      "The headmaster praised the students in his class."
+    ],
+    answer:0,
+    qtype:"Who", infoType:"Chủ thể",
+    evidence:"The headmaster praised the voluntary group",
+    traps:["Đảo chủ thể"],
+    elimination:"B đảo chủ thể. C, D thêm chủ thể không có trong câu.",
+    strategy:"Khoanh tròn chủ ngữ và tân ngữ; xác định ai khen ai.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"R24_02", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"The science club will launch a new project next month.",
+    question:"When will the science club launch the project?",
+    options:[
+      "Last week.",
+      "Next month.",
+      "Yesterday.",
+      "It has already been launched."
+    ],
+    answer:1,
+    qtype:"When", infoType:"Thời gian/Trạng thái",
+    evidence:"will launch... next month",
+    traps:["Đảo thời gian"],
+    elimination:"A, C, D đảo thời gian về quá khứ hoặc bảo đã xảy ra, trái với 'will launch next month'.",
+    strategy:"Kiểm tra thì (will launch: tương lai; launched: quá khứ).",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"R24_03", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Regular physical activity usually helps reduce stress.",
+    question:"Which statement is closest to the passage?",
+    options:[
+      "Regular physical activity always eliminates stress completely.",
+      "Regular physical activity usually helps reduce stress.",
+      "Regular physical activity never reduces stress.",
+      "Only intense exercise can reduce stress."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Phạm vi/Mức độ",
+    evidence:"usually helps reduce stress",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'always... completely'. C dùng 'never'. D dùng 'only'. Tất cả đều lệch mức độ của 'usually'.",
+    strategy:"Chú ý usually (thường) khác hoàn toàn với always/completely/never.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R24_04", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Students can join the trip only if they finish their essays.",
+    question:"What condition must students meet to join the trip?",
+    options:[
+      "They must finish their essays.",
+      "They must not finish their essays.",
+      "They must pay a fee.",
+      "They can join the trip unless they finish their essays."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Điều kiện",
+    evidence:"only if they finish their essays",
+    traps:["Đảo điều kiện"],
+    elimination:"B phủ định điều kiện. C thêm phí ngoài bài. D dùng 'unless' làm đảo ngược điều kiện.",
+    strategy:"Phân biệt only if (chỉ khi) và unless (trừ khi / nếu không).",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R24_05", theme:"Tái kiểm tra 24h", diff:"Retest", target:60,
+    passage:"Air pollution in large cities is mainly caused by vehicle emissions and industrial activity. In rural areas, the population is growing slowly.",
+    question:"What mainly causes air pollution in large cities?",
+    options:[
+      "Vehicle emissions and industrial activity.",
+      "Rapid population growth in rural areas.",
+      "A lack of public parks.",
+      "Too many bicycles in the countryside."
+    ],
+    answer:0,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"Air pollution in large cities is mainly caused by vehicle emissions and industrial activity",
+    traps:["Chi tiết lạc đề"],
+    elimination:"B là chi tiết có thể đúng thực tế nhưng lạc đề. C, D không có trong bài.",
+    strategy:"Kiểm tra L4: chi tiết đó có trả lời đúng câu hỏi về thành phố lớn không?",
+    layerFocus:"L4 Mục đích"
+  }
+];
+
+/* =========================================================
+   3. ÔN 7 NGÀY – 5 CÂU ĐA BẪY
+   ========================================================= */
+const RETEST_7D = [
+  {
+    id:"R7_01", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"Urban planners are increasingly promoting green roofs on public buildings. A recent study found that green roofs can reduce indoor temperatures by up to five degrees during hot months, but only when the plants receive enough water and the roof is well insulated. The researchers stress that a green roof is not a substitute for reducing energy consumption overall; it is one of several measures that cities can use.",
+    question:"According to the study, what is true about green roofs?",
+    options:[
+      "They always reduce indoor temperatures by exactly five degrees in every building.",
+      "They can reduce indoor temperatures, but only under certain conditions and as one of several measures.",
+      "They replace the need to reduce energy consumption completely.",
+      "They work best when plants are never watered."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"can reduce indoor temperatures by up to five degrees... but only when... one of several measures",
+    traps:["Tuyệt đối hóa","Đảo phạm vi"],
+    elimination:"A dùng 'always' và 'exactly five degrees' sai mức độ. C nói 'completely' trái với 'not a substitute'. D ngược điều kiện 'enough water'.",
+    strategy:"So sánh từ mềm 'can/up to/only when' với từ tuyệt đối 'always/completely'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R7_02", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"An online language course is popular because learners can study at any time. However, teachers warn that flexibility alone does not guarantee success. Students who set a fixed weekly schedule and submit assignments regularly tend to make faster progress than those who study only when they feel motivated. The course designers therefore recommend short daily sessions rather than long weekend sessions.",
+    question:"What do the course designers recommend for better progress?",
+    options:[
+      "Studying only when feeling motivated.",
+      "Short daily sessions rather than long weekend sessions.",
+      "Avoiding a fixed schedule to keep flexibility.",
+      "Completing all assignments only at weekends."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Hành động/Sự kiện",
+    evidence:"recommend short daily sessions rather than long weekend sessions",
+    traps:["Đảo thời gian","Đảo điều kiện"],
+    elimination:"A là nhóm tiến bộ chậm. C ngược với 'fixed weekly schedule'. D sai vì bài khuyến nghị hằng ngày, không phải cuối tuần.",
+    strategy:"Tìm cụm 'recommend' và đối chiếu cấu trúc 'rather than'.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"R7_03", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"Many people believe that drinking more water automatically improves skin health. Dermatologists say the relationship is more limited: adequate hydration supports overall health, but there is little evidence that extra water clears acne or removes wrinkles. They recommend a balanced diet, enough sleep, and sun protection instead of focusing only on water intake.",
+    question:"What do dermatologists say about drinking extra water for skin health?",
+    options:[
+      "Extra water always clears acne and removes wrinkles.",
+      "Adequate hydration supports health, but extra water is not proven to clear acne or remove wrinkles.",
+      "Drinking water is the only effective skin treatment.",
+      "Water intake has no effect on any part of health."
+    ],
+    answer:1,
+    qtype:"What", infoType:"Phạm vi/Mức độ",
+    evidence:"adequate hydration supports overall health... little evidence that extra water clears acne or removes wrinkles",
+    traps:["Tuyệt đối hóa","Đảo phạm vi"],
+    elimination:"A dùng 'always'. C dùng 'only'. D nói 'no effect on any part' trái với 'supports overall health'.",
+    strategy:"Chú ý 'little evidence' và 'instead of only' để loại các đáp án tuyệt đối.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  },
+  {
+    id:"R7_04", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"The town library extended its opening hours last month to help students prepare for exams. Although the new schedule was welcomed by many, the library director noted that most users still visit in the afternoon. She plans to run a survey before deciding whether to keep the late-night opening, because electricity costs have risen and staff are limited.",
+    question:"Why does the library director plan to run a survey?",
+    options:[
+      "Because most users visit in the afternoon and costs/staff are concerns.",
+      "Because the new schedule was rejected by all students.",
+      "Because the library wants to close permanently.",
+      "Because electricity costs have fallen."
+    ],
+    answer:0,
+    qtype:"Why", infoType:"Nguyên nhân/Mục đích",
+    evidence:"most users still visit in the afternoon... electricity costs have risen and staff are limited",
+    traps:["Đảo nguyên nhân–kết quả","Tuyệt đối hóa"],
+    elimination:"B dùng 'all' và 'rejected' sai. C, D ngược thông tin.",
+    strategy:"Tìm từ 'because' ở cuối câu và kiểm tra lý do thực tế.",
+    layerFocus:"L4 Mục đích"
+  },
+  {
+    id:"R7_05", theme:"Ôn 7 ngày", diff:"Retest", target:75,
+    passage:"A school choir recently performed at a local festival. The audience included students, parents, and several local artists. While the choir received positive comments, the conductor said that the most important outcome was not the applause but the members' improved cooperation. She added that future performances should include more songs from different cultures.",
+    question:"According to the conductor, what was the most important outcome of the performance?",
+    options:[
+      "The number of local artists in the audience.",
+      "The applause from the audience.",
+      "The choir members' improved cooperation.",
+      "The decision to stop performing."
+    ],
+    answer:2,
+    qtype:"What", infoType:"Nguyên nhân/Mục đích",
+    evidence:"the most important outcome was not the applause but the members' improved cooperation",
+    traps:["Chi tiết lạc đề","Đảo mục đích"],
+    elimination:"A là chi tiết đúng nhưng lạc đề. B là điều bài phủ định là quan trọng nhất. D không có trong bài.",
+    strategy:"Chú ý cấu trúc 'not A but B' để xác định ý chính.",
+    layerFocus:"L4 Mục đích"
+  }
+];
+
+/* =========================================================
+   4. DỌN LỖI CÁ NHÂN – 3 CÂU
+   ========================================================= */
+const PERSONAL = [
+  {
+    id:"P_01", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"The new app does not work offline.",
+    question:"Which statement is true according to the sentence?",
+    options:[
+      "The app works offline.",
+      "The app does not work offline.",
+      "The app works only offline.",
+      "The app always works offline."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Hành động/Sự kiện",
+    evidence:"does not work offline",
+    traps:["Đảo phủ định"],
+    elimination:"A đảo phủ định. C, D thêm 'only/always' không có trong câu.",
+    strategy:"Gạch chân từ phủ định: not, never, fail to, without.",
+    layerFocus:"L2 Thời gian/Trạng thái"
+  },
+  {
+    id:"P_02", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"The teacher asked the students to submit their projects. The students then asked the teacher for feedback.",
+    question:"Who asked for feedback?",
+    options:[
+      "The teacher asked the students.",
+      "The students asked the teacher.",
+      "Both asked for feedback.",
+      "Neither asked for feedback."
+    ],
+    answer:1,
+    qtype:"Who", infoType:"Chủ thể",
+    evidence:"The students then asked the teacher for feedback",
+    traps:["Đảo chủ thể"],
+    elimination:"A đảo chủ thể. C, D sai vì chỉ học sinh hỏi.",
+    strategy:"Khoanh tròn chủ thể của hành động 'asked for feedback'.",
+    layerFocus:"L1 Chủ thể"
+  },
+  {
+    id:"P_03", theme:"Dọn lỗi cá nhân", diff:"Cá nhân", target:45,
+    passage:"Many students may benefit from short breaks during long study sessions.",
+    question:"Which answer matches the sentence?",
+    options:[
+      "All students must take short breaks.",
+      "Many students may benefit from short breaks.",
+      "No student benefits from short breaks.",
+      "Short breaks always fail."
+    ],
+    answer:1,
+    qtype:"Which", infoType:"Phạm vi/Mức độ",
+    evidence:"Many students may benefit",
+    traps:["Tuyệt đối hóa"],
+    elimination:"A dùng 'All... must'. C dùng 'No'. D dùng 'always' trái với 'may benefit'.",
+    strategy:"Đối chiếu 'many/may' với 'all/must/always'.",
+    layerFocus:"L3 Phạm vi/Mức độ"
+  }
+];
+
+/* =========================================================
+   5. CẤU HÌNH & HÀM TIỆN ÍCH
+   ========================================================= */
+const ALL_QUESTIONS = [...QUESTION_BANK, ...RETEST_24H, ...RETEST_7D, ...PERSONAL];
+const QMAP = Object.fromEntries(ALL_QUESTIONS.map(q => [q.id, q]));
+
+const MODE_LABELS = {
+  practice: "Luyện 20 câu chuẩn",
+  retest24: "Tái kiểm tra 24h",
+  retest7: "Ôn 7 ngày",
+  personal: "Dọn lỗi cá nhân"
+};
+
+const QTYPE_OPTIONS = ["Who","What","When","Where","Why","How","How many","Which"];
+const INFO_TYPES = ["Chủ thể","Hành động/Sự kiện","Thời gian/Trạng thái","Nguyên nhân/Mục đích","Phạm vi/Mức độ","Điều kiện"];
+
+const LS_KEY = "phx_results_v1";
+let state = { finished: true };
+let lastResult = null;
+let teacherClass = "";
+let teacherFiltered = [];
+let memoryResults = [];
+
+function escapeHtml(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+}
+
+function selected(value, current){
+  return String(value) === String(current) ? "selected" : "";
+}
+
+function checked(arr, val){
+  return (arr || []).includes(String(val)) ? "checked" : "";
+}
+
+function formatTime(sec){
+  sec = Math.max(0, Math.floor(Number(sec) || 0));
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function formatDate(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString("vi-VN", {
+    hour:"2-digit", minute:"2-digit", day:"2-digit", month:"2-digit", year:"numeric"
+  });
+}
+
+function diffClass(diff){
+  const d = String(diff || "").toLowerCase();
+  if (d.includes("dễ") || d.includes("easy")) return "easy";
+  if (d.includes("trung") || d.includes("medium")) return "medium";
+  if (d.includes("khó") || d.includes("hard")) return "hard";
+  return "retest";
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function copyText(text){
+  if (!text) return;
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text)
+      .then(() => showToast("Đã sao chép"))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); showToast("Đã sao chép"); }
+  catch(e){ showToast("Không thể sao chép tự động"); }
+  ta.remove();
+}
+
+function getPrefs(){
+  try {
+    return JSON.parse(localStorage.getItem("phx_user_v1") || "{}");
+  } catch(e){
+    return {};
+  }
+}
+
+function savePrefs(student, className){
+  try {
+    localStorage.setItem("phx_user_v1", JSON.stringify({student, className}));
+  } catch(e){}
+}
+
+function getResults(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return memoryResults;
+}
+
+function saveResults(arr){
+  memoryResults = arr;
+  try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); } catch(e){}
+}
+
+function saveResult(result){
+  const arr = getResults();
+  const idx = arr.findIndex(x => x.id === result.id);
+  if (idx >= 0) arr[idx] = result;
+  else arr.push(result);
+  saveResults(arr);
+}
+
+/* =========================================================
+   6. MÃ HÓA KẾT QUẢ ĐỂ GỬI GIÁO VIÊN
+   ========================================================= */
+function b64urlEncodeUtf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlDecodeUtf8(code){
+  let base64 = code.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4) base64 += "=";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeResult(obj){
+  const copy = { ...obj };
+  delete copy.code;
+  return "PHX1." + b64urlEncodeUtf8(JSON.stringify(copy));
+}
+
+function decodeResult(code){
+  if (typeof code !== "string" || !code.startsWith("PHX1.")) throw new Error("bad code");
+  const obj = JSON.parse(b64urlDecodeUtf8(code.slice(5)));
+  if (!obj || !Array.isArray(obj.answers) || !obj.student) throw new Error("bad result");
+  return obj;
+}
+
+/* =========================================================
+   7. MÀN HÌNH THIẾT LẬP
+   ========================================================= */
+function renderSetup(){
+  const prefs = getPrefs();
+
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Kỹ thuật phản xạ 4 lớp</div>
+        <h1>Biến “đọc hiểu” thành phản xạ</h1>
+        <p>
+          Học sinh làm 20 câu chuẩn, ghi phiếu phản xạ trước khi chốt đáp án.
+          Giáo viên nhận báo cáo theo bẫy, độ khó, chủ đề và từng học sinh.
+          Không cần đăng nhập; dữ liệu lưu trên máy hoặc gửi bằng mã kết quả.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>4 lớp kiểm tra</strong>
+        <p>L1 Chủ thể · L2 Thời gian/Trạng thái · L3 Phạm vi/Mức độ · L4 Mục đích câu hỏi</p>
+        <span class="small">Mỗi câu có bằng chứng, loại bẫy, cách loại trừ và chiến lược phản xạ.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="grid-2">
+        <div>
+          <h2 style="margin-top:0">Thiết lập lượt luyện</h2>
+          <label class="field">
+            Họ tên học sinh
+            <input id="studentName" value="${escapeHtml(prefs.student || "")}" placeholder="Nhập họ tên">
+          </label>
+          <label class="field">
+            Lớp
+            <input id="className" value="${escapeHtml(prefs.className || "")}" placeholder="Ví dụ: 10A1">
+          </label>
+          <label class="field">
+            Chế độ luyện
+            <select id="mode">
+              <option value="practice">Luyện 20 câu chuẩn (Dễ → Khó)</option>
+              <option value="retest24">Tái kiểm tra 24h (5 bẫy)</option>
+              <option value="retest7">Ôn 7 ngày (5 câu đa bẫy)</option>
+              <option value="personal">Dọn lỗi cá nhân (3 câu)</option>
+            </select>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="requireReflection" checked>
+            <span>
+              <b>Bắt buộc ghi phiếu phản xạ 4 lớp</b>
+              <br><span class="small">Khuyến nghị bật để luyện phản xạ; tắt nếu chỉ cần kiểm tra nhanh.</span>
+            </span>
+          </label>
+          <div class="toolbar" style="margin-top:16px">
+            <button class="btn primary" onclick="startQuiz()">Bắt đầu luyện</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0">Quy trình 4 bước</h3>
+          <div class="step">
+            <b>1. Đọc câu hỏi &amp; gạch chân từ khóa</b>
+            <p>Xác định đối tượng, hành động hoặc từ để hỏi: Who, What, When, Where, Why, How, How many.</p>
+          </div>
+          <div class="step">
+            <b>2. Xác định loại thông tin</b>
+            <p>Khoanh vùng: chủ thể, thời gian, trạng thái, phạm vi/mức độ hay mục đích.</p>
+          </div>
+          <div class="step">
+            <b>3. Quét đoạn đọc &amp; paraphrase</b>
+            <p>Tìm vùng chứa từ khóa hoặc từ đồng nghĩa/cấu trúc tương đương.</p>
+          </div>
+          <div class="step">
+            <b>4. Kiểm tra 4 lớp trước khi chọn</b>
+            <p>L1 Chủ thể · L2 Thời gian/Trạng thái · L3 Phạm vi/Mức độ · L4 Mục đích câu hỏi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Tiêu chí nghiệm thu</h2>
+      <div class="stats-grid">
+        <div class="stat"><span>Đạt chuẩn gợi ý</span><strong>≥80%</strong></div>
+        <div class="stat"><span>Phản xạ</span><strong>4/4 lớp</strong></div>
+        <div class="stat"><span>Tái kiểm tra</span><strong>24h</strong></div>
+        <div class="stat"><span>Ôn duy trì</span><strong>7 ngày</strong></div>
+      </div>
+      <p class="small">
+        Học sinh sai câu nào sẽ được chuyển vào bộ tái kiểm tra theo bẫy sai.
+        Giáo viên có thể nhập mã kết quả từ học sinh để tổng hợp cả lớp.
+      </p>
+    </section>
+  `;
+}
+
+/* =========================================================
+   8. BẮT ĐẦU / VẼ CÂU HỎI
+   ========================================================= */
+function beginQuiz(opts = {}){
+  stopTimer();
+  const mode = opts.mode || "practice";
+  const student = opts.student || "Học sinh";
+  const className = opts.className || "Chưa rõ";
+  const requireReflection = opts.requireReflection !== false;
+  const questions = opts.questions && opts.questions.length ? opts.questions : getQuestions(mode);
+
+  state = {
+    mode,
+    student,
+    className,
+    requireReflection,
+    questions,
+    current: 0,
+    answers: [],
+    reflections: {},
+    start: Date.now(),
+    timerId: null,
+    answered: false,
+    finished: false,
+    qStart: 0,
+    modeLabel: MODE_LABELS[mode] || mode
+  };
+
+  savePrefs(student, className);
+  renderQuiz();
+}
+
+function startQuiz(){
+  const name = document.getElementById("studentName")?.value.trim() || "Học sinh";
+  const className = document.getElementById("className")?.value.trim() || "Chưa rõ";
+  const mode = document.getElementById("mode")?.value || "practice";
+  const requireReflection = document.getElementById("requireReflection")?.checked ?? true;
+  beginQuiz({ mode, student: name, className, requireReflection });
+}
+
+function getQuestions(mode){
+  if (mode === "retest24") return RETEST_24H;
+  if (mode === "retest7") return RETEST_7D;
+  if (mode === "personal") return PERSONAL;
+  return QUESTION_BANK;
+}
+
+function renderQuiz(){
+  stopTimer();
+  const q = state.questions[state.current];
+  if (!q){ finishQuiz(); return; }
+
+  const total = state.questions.length;
+  const progress = (state.current / total) * 100;
+  const ref = state.reflections[q.id] || { qtype:"", infoType:"", evidence:"", layers:[] };
+
+  const optionHtml = q.options.map((opt, i) => `
+    <button type="button" class="option" data-index="${i}">
+      <span class="letter">${String.fromCharCode(65 + i)}</span>
+      <span>${escapeHtml(opt)}</span>
+    </button>
+  `).join("");
+
+  app.innerHTML = `
+    <section class="quiz-head">
+      <div class="progress"><div style="width:${progress}%"></div></div>
+      <div class="quiz-meta">
+        <span>Câu ${state.current + 1}/${total}</span>
+        <span>Mục tiêu: ${q.target}s</span>
+        <span id="timer">00:00</span>
+      </div>
+    </section>
+
+    <div class="quiz-grid">
+      <section class="card question-card">
+        <div class="tags">
+          <span class="tag ${diffClass(q.diff)}">${escapeHtml(q.diff)}</span>
+          <span class="tag">${escapeHtml(q.theme)}</span>
+          <span class="tag">${escapeHtml(q.qtype)}</span>
+        </div>
+
+        <div class="passage">${escapeHtml(q.passage)}</div>
+        <h2>${escapeHtml(q.question)}</h2>
+
+        <div class="options">${optionHtml}</div>
+        <div id="feedback" class="feedback hidden"></div>
+        <div id="nextActions" class="next-actions"></div>
+      </section>
+
+      <aside class="card reflection-card" id="reflectionPanel">
+        <h3>Phiếu phản xạ 4 lớp</h3>
+        <p class="small" style="margin-top:0">
+          Hoàn tất phiếu trước khi chốt đáp án. Giáo viên sẽ nhận được nhật ký phản xạ này.
+        </p>
+
+        <label class="field">
+          1. Từ hỏi
+          <select id="qtype">
+            <option value="">Chọn từ hỏi</option>
+            ${QTYPE_OPTIONS.map(o => `<option value="${o}" ${selected(o, ref.qtype)}>${o}</option>`).join("")}
+          </select>
+        </label>
+
+        <label class="field">
+          2. Loại thông tin cần tìm
+          <select id="infoType">
+            <option value="">Chọn loại thông tin</option>
+            ${INFO_TYPES.map(o => `<option value="${o}" ${selected(o, ref.infoType)}>${o}</option>`).join("")}
+          </select>
+        </label>
+
+        <label class="field">
+          3. Bằng chứng / Paraphrase
+          <input id="evidence" value="${escapeHtml(ref.evidence || "")}" placeholder="Gõ cụm từ khóa, 2–5 từ">
+        </label>
+
+        <label class="field">4. Đã kiểm tra đủ 4 lớp</label>
+        <div class="layers">
+          <label class="layer">
+            <input type="checkbox" data-layer="1" ${checked(ref.layers, "1")}>
+            <span><b>L1 Chủ thể</b><br>Ai thực hiện? Ai bị tác động?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="2" ${checked(ref.layers, "2")}>
+            <span><b>L2 Thời gian/Trạng thái</b><br>Đã xảy ra, đang xảy ra hay sẽ xảy ra?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="3" ${checked(ref.layers, "3")}>
+            <span><b>L3 Phạm vi/Mức độ</b><br>Some, most, all? May, always?</span>
+          </label>
+          <label class="layer">
+            <input type="checkbox" data-layer="4" ${checked(ref.layers, "4")}>
+            <span><b>L4 Mục đích câu hỏi</b><br>Đúng ý hỏi hay đúng nhưng lạc đề?</span>
+          </label>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  bindQuizEvents();
+  startTimer();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function bindQuizEvents(){
+  document.querySelectorAll(".option").forEach((el, idx) => {
+    el.addEventListener("click", () => selectOption(idx));
+  });
+
+  ["qtype", "infoType", "evidence"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", saveReflection);
+  });
+
+  document.querySelectorAll("[data-layer]").forEach(cb => {
+    cb.addEventListener("change", saveReflection);
+  });
+}
+
+function getReflectionFromDom(){
+  return {
+    qtype: document.getElementById("qtype")?.value || "",
+    infoType: document.getElementById("infoType")?.value || "",
+    evidence: (document.getElementById("evidence")?.value || "").trim(),
+    layers: Array.from(document.querySelectorAll("[data-layer]:checked")).map(el => el.dataset.layer)
+  };
+}
+
+function saveReflection(){
+  if (!state || !state.questions) return;
+  const q = state.questions[state.current];
+  if (!q) return;
+  state.reflections[q.id] = getReflectionFromDom();
+}
+
+function isReflectionComplete(ref){
+  return !!(
+    ref.qtype &&
+    ref.infoType &&
+    ref.evidence &&
+    ref.evidence.length >= 2 &&
+    Array.isArray(ref.layers) &&
+    ref.layers.length === 4
+  );
+}
+
+function selectOption(idx){
+  if (!state || state.answered) return;
+  const q = state.questions[state.current];
+  if (!q) return;
+
+  const ref = getReflectionFromDom();
+  state.reflections[q.id] = ref;
+
+  if (state.requireReflection && !isReflectionComplete(ref)){
+    if (!ref.qtype) showToast("Bước 1: chọn từ hỏi (Who/What/Why...)");
+    else if (!ref.infoType) showToast("Bước 2: chọn loại thông tin cần tìm");
+    else if (ref.evidence.length < 2) showToast("Bước 3: ghi cụm từ khóa/bằng chứng");
+    else showToast("Bước 4: đánh dấu đủ 4 lớp kiểm tra");
+    return;
+  }
+
+  const correct = idx === q.answer;
+  state.answered = true;
+  stopTimer();
+
+  const elapsed = Math.floor((Date.now() - state.qStart) / 1000);
+  const answer = {
+    qid: q.id,
+    selected: idx,
+    correct,
+    elapsed,
+    qtype: ref.qtype,
+    infoType: ref.infoType,
+    evidence: ref.evidence,
+    layers: ref.layers,
+    reflectionRequired: state.requireReflection,
+    reflectionDone: state.requireReflection ? true : null
+  };
+
+  state.answers.push(answer);
+  state.reflections[q.id] = ref;
+
+  document.querySelectorAll(".option").forEach((el, i) => {
+    el.disabled = true;
+    if (i === q.answer) el.classList.add("correct");
+    if (i === idx && !correct) el.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("feedback");
+  fb.className = "feedback " + (correct ? "ok" : "bad");
+  fb.innerHTML = renderFeedback(q, correct);
+
+  document.getElementById("nextActions").innerHTML = `
+    <button class="btn primary" onclick="nextQuestion()">
+      ${state.current === state.questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo"}
+    </button>
+  `;
+
+  document.querySelectorAll("#reflectionPanel input, #reflectionPanel select").forEach(el => el.disabled = true);
+
+  const progress = document.querySelector(".progress > div");
+  if (progress) progress.style.width = `${((state.current + 1) / state.questions.length) * 100}%`;
+}
+
+function renderFeedback(q, correct){
+  const correctLetter = String.fromCharCode(65 + q.answer);
+  return `
+    <div class="fb-title">${correct ? "✓ Chính xác" : "✗ Chưa đúng"}</div>
+    <p><strong>Đáp án đúng:</strong> ${correctLetter}. ${escapeHtml(q.options[q.answer])}</p>
+    <p><strong>Bằng chứng:</strong> “${escapeHtml(q.evidence)}”</p>
+    <p><strong>Bẫy:</strong> ${escapeHtml(q.traps.join(" • "))}</p>
+    <p><strong>Loại trừ:</strong> ${escapeHtml(q.elimination)}</p>
+    <p><strong>Chiến lược:</strong> ${escapeHtml(q.strategy)}</p>
+    <p><strong>Lớp quyết định:</strong> ${escapeHtml(q.layerFocus)}</p>
+  `;
+}
+
+function nextQuestion(){
+  if (!state) return;
+  stopTimer();
+  if (state.current >= state.questions.length - 1){
+    finishQuiz();
+    return;
+  }
+  state.current++;
+  state.answered = false;
+  renderQuiz();
+}
+
+/* =========================================================
+   9. TÍNH TOÁN & KẾT QUẢ HỌC SINH
+   ========================================================= */
+function computeStats(result){
+  const stats = {
+    byDiff: {},
+    byTrap: {},
+    byTheme: {},
+    reflectionReq: 0,
+    reflectionDone: 0
+  };
+
+  (result.answers || []).forEach(a => {
+    const q = QMAP[a.qid];
+    if (!q) return;
+
+    const d = q.diff || "Khác";
+    stats.byDiff[d] = stats.byDiff[d] || { total: 0, correct: 0 };
+    stats.byDiff[d].total++;
+    if (a.correct) stats.byDiff[d].correct++;
+
+    const t = q.theme || "Khác";
+    stats.byTheme[t] = stats.byTheme[t] || { total: 0, correct: 0 };
+    stats.byTheme[t].total++;
+    if (a.correct) stats.byTheme[t].correct++;
+
+    (q.traps || []).forEach(trap => {
+      stats.byTrap[trap] = stats.byTrap[trap] || { total: 0, wrong: 0 };
+      stats.byTrap[trap].total++;
+      if (!a.correct) stats.byTrap[trap].wrong++;
+    });
+
+    if (a.reflectionRequired){
+      stats.reflectionReq++;
+      if (a.reflectionDone) stats.reflectionDone++;
+    }
+  });
+
+  return stats;
+}
+
+function miniStat(label, total, correct){
+  const pct = total ? Math.round(correct / total * 100) : 0;
+  return `
+    <div class="mini-stat">
+      <div><span>${escapeHtml(label)}</span><strong>${pct}%</strong></div>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="small">${correct}/${total} câu</div>
+    </div>
+  `;
+}
+
+function finishQuiz(){
+  stopTimer();
+  if (!state) return;
+  state.finished = true;
+
+  const total = state.questions.length;
+  const correctCount = state.answers.filter(a => a.correct).length;
+  const durationSec = state.answers.reduce((sum, a) => sum + (a.elapsed || 0), 0);
+
+  const result = {
+    id: "r_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+    student: state.student,
+    className: state.className,
+    mode: state.mode,
+    modeLabel: state.modeLabel,
+    dateISO: new Date().toISOString(),
+    score: correctCount,
+    total,
+    percent: total ? Math.round(correctCount / total * 100) : 0,
+    durationSec,
+    answers: state.answers.slice()
+  };
+
+  result.code = encodeResult(result);
+  lastResult = result;
+  saveResult(result);
+  renderResult(result);
+}
+
+function renderResult(r){
+  const answers = r.answers || [];
+  const wrong = answers.filter(a => !a.correct);
+  const score = Number(r.score) || 0;
+  const total = Number(r.total) || answers.length || 1;
+  const percent = Number(r.percent) || Math.round(score / total * 100);
+  const stats = computeStats(r);
+
+  const diffHtml = Object.entries(stats.byDiff)
+    .map(([d, v]) => miniStat(d, v.total, v.correct))
+    .join("");
+
+  const trapRows = Object.entries(stats.byTrap)
+    .sort((a, b) => b[1].wrong - a[1].wrong)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.wrong}/${v.total}</td>
+        <td>${v.total ? Math.round((v.total - v.wrong) / v.total * 100) : 0}%</td>
+      </tr>
+    `).join("");
+
+  const themeRows = Object.entries(stats.byTheme)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.correct}/${v.total}</td>
+        <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+      </tr>
+    `).join("");
+
+  const wrongRows = wrong.map(a => {
+    const q = QMAP[a.qid];
+    if (!q) return `<tr><td>${escapeHtml(a.qid)}</td><td colspan="4">Không tìm thấy dữ liệu câu hỏi.</td></tr>`;
+    return `
+      <tr>
+        <td>${escapeHtml(q.id)}</td>
+        <td>${escapeHtml(q.question)}</td>
+        <td>${String.fromCharCode(65 + a.selected)}.</td>
+        <td>${String.fromCharCode(65 + q.answer)}. ${escapeHtml(q.options[q.answer])}</td>
+        <td>${escapeHtml(q.traps.join(", "))}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const reflectionRows = answers.map(a => `
+    <tr>
+      <td>${escapeHtml(a.qid)}</td>
+      <td>${escapeHtml(a.qtype || "—")}</td>
+      <td>${escapeHtml(a.infoType || "—")}</td>
+      <td>${escapeHtml(a.evidence || "—")}</td>
+      <td>${Array.isArray(a.layers) ? a.layers.length : 0}/4</td>
+    </tr>
+  `).join("");
+
+  const code = r.code || encodeResult(r);
+  const reflPct = stats.reflectionReq
+    ? Math.round(stats.reflectionDone / stats.reflectionReq * 100)
+    : null;
+
+  app.innerHTML = `
+    <section class="result-header">
+      <div>
+        <div class="eyebrow">Phiếu kết quả</div>
+        <h1 style="margin:8px 0 6px">${escapeHtml(r.student || "Học sinh")}</h1>
+        <p class="small">
+          ${escapeHtml(r.className || "Chưa rõ")} ·
+          ${escapeHtml(r.modeLabel || MODE_LABELS[r.mode] || r.mode)} ·
+          ${escapeHtml(formatDate(r.dateISO))}
+        </p>
+      </div>
+      <div class="score-badge ${percent >= 80 ? "pass" : "fail"}">
+        <span>${percent}%</span>
+        <small>${score}/${total} câu</small>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <button class="btn primary" onclick="showSetup()">Làm lại</button>
+        ${wrong.length ? `<button class="btn ghost" onclick="startRetestFromResult()">Tái kiểm tra theo bẫy sai</button>` : ""}
+        <button class="btn ghost" onclick="startRetest7FromResult()">Ôn 7 ngày</button>
+        <button class="btn ghost" onclick="startPersonalFromResult()">Dọn lỗi cá nhân</button>
+        <button class="btn ghost" onclick="downloadLastResult()">Tải JSON</button>
+        <button class="btn ghost" onclick="copyLastResult()">Sao chép mã</button>
+        <button class="btn ghost" onclick="window.print()">In phiếu</button>
+        <button class="btn ghost" onclick="showTeacher()">Báo cáo giáo viên</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span>Điểm</span><strong>${percent}%</strong></div>
+        <div class="stat"><span>Đúng</span><strong>${score}/${total}</strong></div>
+        <div class="stat"><span>Thời gian</span><strong>${formatTime(r.durationSec || 0)}</strong></div>
+        <div class="stat">
+          <span>Phiếu phản xạ</span>
+          <strong>${reflPct == null ? "—" : reflPct + "%"}</strong>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:8px">Theo độ khó</h3>
+      ${diffHtml || `<p class="small">Chưa có dữ liệu.</p>`}
+
+      <details>
+        <summary>Xem theo chủ đề</summary>
+        <div class="table-wrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>Chủ đề</th><th>Đúng/Tổng</th><th>%</th></tr></thead>
+            <tbody>${themeRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Câu chưa đạt</h2>
+      ${wrong.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã câu</th>
+                <th>Câu hỏi</th>
+                <th>Chọn</th>
+                <th>Đúng</th>
+                <th>Bẫy</th>
+              </tr>
+            </thead>
+            <tbody>${wrongRows}</tbody>
+          </table>
+        </div>
+      ` : `<div class="empty">Không có câu sai. Xuất sắc!</div>`}
+
+      <details>
+        <summary>Nhật ký phản xạ (${answers.length} câu)</summary>
+        <div class="table-wrap" style="margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã câu</th>
+                <th>Từ hỏi</th>
+                <th>Loại thông tin</th>
+                <th>Bằng chứng</th>
+                <th>4 lớp</th>
+              </tr>
+            </thead>
+            <tbody>${reflectionRows || `<tr><td colspan="5" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Gửi kết quả cho giáo viên</h2>
+      <p class="small">
+        Học sinh sao chép mã dưới đây và gửi giáo viên qua Zalo/Google Classroom/email.
+        Giáo viên mở <b>Báo cáo giáo viên → Nhập mã kết quả</b>.
+      </p>
+      <textarea class="code-area" id="resultCode" readonly>${escapeHtml(code)}</textarea>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn primary" onclick="copyText(document.getElementById('resultCode').value)">Sao chép mã</button>
+        <button class="btn ghost" onclick="downloadLastResult()">Tải file JSON</button>
+      </div>
+      <p class="small">
+        Lưu ý: mã chứa họ tên/lớp. Chỉ gửi cho giáo viên, không đăng công khai.
+      </p>
+    </section>
+  `;
+}
+
+/* =========================================================
+   10. TÁI KIỂM TRA / LUYỆN THÊM TỪ KẾT QUẢ
+   ========================================================= */
+function startRetestFromResult(){
+  if (!lastResult) return;
+  const wrong = (lastResult.answers || []).filter(a => !a.correct);
+  const wrongQs = wrong.map(a => QMAP[a.qid]).filter(Boolean);
+  const traps = new Set(wrongQs.flatMap(q => q.traps || []));
+
+  let set = RETEST_24H.filter(q => (q.traps || []).some(t => traps.has(t)));
+  if (set.length === 0) set = RETEST_24H.slice();
+
+  beginQuiz({
+    mode: "retest24",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true,
+    questions: set
+  });
+}
+
+function startRetest7FromResult(){
+  if (!lastResult) return;
+  beginQuiz({
+    mode: "retest7",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true
+  });
+}
+
+function startPersonalFromResult(){
+  if (!lastResult) return;
+  beginQuiz({
+    mode: "personal",
+    student: lastResult.student,
+    className: lastResult.className,
+    requireReflection: true
+  });
+}
+
+function downloadLastResult(){
+  if (lastResult) downloadResult(lastResult);
+}
+
+function copyLastResult(){
+  if (lastResult) copyText(lastResult.code || encodeResult(lastResult));
+}
+
+function downloadResult(r){
+  if (!r) return;
+  const blob = new Blob([JSON.stringify(r, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  const safeName = String(r.student || "hoc-sinh").replace(/\s+/g, "-");
+  a.href = URL.createObjectURL(blob);
+  a.download = `ket-qua-${safeName}-${r.id || "result"}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast("Đã tải JSON");
+}
+
+/* =========================================================
+   11. BÁO CÁO GIÁO VIÊN
+   ========================================================= */
+function aggregateResults(results){
+  const stats = {
+    attempts: results.length,
+    totalPercent: 0,
+    passCount: 0,
+    avg: 0,
+    passRate: 0,
+    traps: {},
+    questions: {},
+    themes: {},
+    reflectionReq: 0,
+    reflectionDone: 0
+  };
+
+  results.forEach(r => {
+    const pct = Number(r.percent) || 0;
+    stats.totalPercent += pct;
+    if (pct >= 80) stats.passCount++;
+
+    (r.answers || []).forEach(a => {
+      const q = QMAP[a.qid];
+      if (!q) return;
+
+      const qt = stats.questions[a.qid] || { total: 0, correct: 0, diff: q.diff, theme: q.theme };
+      qt.total++;
+      if (a.correct) qt.correct++;
+      stats.questions[a.qid] = qt;
+
+      const th = stats.themes[q.theme] || { total: 0, correct: 0 };
+      th.total++;
+      if (a.correct) th.correct++;
+      stats.themes[q.theme] = th;
+
+      (q.traps || []).forEach(trap => {
+        const tr = stats.traps[trap] || { total: 0, wrong: 0 };
+        tr.total++;
+        if (!a.correct) tr.wrong++;
+        stats.traps[trap] = tr;
+      });
+
+      if (a.reflectionRequired){
+        stats.reflectionReq++;
+        if (a.reflectionDone) stats.reflectionDone++;
+      }
+    });
+  });
+
+  stats.avg = results.length ? Math.round(stats.totalPercent / results.length) : 0;
+  stats.passRate = results.length ? Math.round(stats.passCount / results.length * 100) : 0;
+  return stats;
+}
+
+function showTeacher(){
+  if (state && !state.finished && state.answers && state.answers.length > 0){
+    if (!confirm("Bạn đang làm dở. Vẫn mở báo cáo giáo viên?")) return;
+  }
+  stopTimer();
+  renderTeacher();
+}
+
+function renderTeacher(){
+  stopTimer();
+  const all = getResults();
+  const classes = [...new Set(all.map(r => r.className || "Chưa rõ"))]
+    .sort((a, b) => a.localeCompare(b, "vi"));
+
+  if (teacherClass && !classes.includes(teacherClass)) teacherClass = "";
+
+  const filtered = all.filter(r => !teacherClass || (r.className || "Chưa rõ") === teacherClass);
+  const rows = filtered.slice().sort((a, b) => new Date(b.dateISO || 0) - new Date(a.dateISO || 0));
+  teacherFiltered = rows;
+
+  const stats = aggregateResults(rows);
+
+  const classOptions = `<option value="">Tất cả lớp</option>` + classes.map(c => `
+    <option value="${escapeHtml(c)}" ${teacherClass === c ? "selected" : ""}>${escapeHtml(c)}</option>
+  `).join("");
+
+  const rowsHtml = rows.map((r, i) => {
+    const total = Number(r.total) || (r.answers || []).length || 0;
+    const score = Number(r.score) || 0;
+    const wrong = Math.max(0, total - score);
+    const req = (r.answers || []).filter(a => a.reflectionRequired).length;
+    const done = (r.answers || []).filter(a => a.reflectionRequired && a.reflectionDone).length;
+    const refl = req ? `${done}/${req}` : "—";
+
+    return `
+      <tr>
+        <td>${escapeHtml(formatDate(r.dateISO))}</td>
+        <td>${escapeHtml(r.student || "—")}</td>
+        <td>${escapeHtml(r.className || "—")}</td>
+        <td>${escapeHtml(r.modeLabel || MODE_LABELS[r.mode] || r.mode)}</td>
+        <td>${Number(r.percent) || 0}%</td>
+        <td>${score}/${total}</td>
+        <td>${formatTime(Number(r.durationSec) || 0)}</td>
+        <td>${wrong}</td>
+        <td>${refl}</td>
+        <td><button class="btn small ghost" onclick="copyResultByIndex(${i})">Sao chép mã</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  const trapRows = Object.entries(stats.traps)
+    .sort((a, b) => b[1].wrong - a[1].wrong)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.wrong}/${v.total}</td>
+        <td>${v.total ? Math.round((v.total - v.wrong) / v.total * 100) : 0}%</td>
+      </tr>
+    `).join("");
+
+  const qRows = Object.entries(stats.questions)
+    .sort((a, b) => (a[1].correct / (a[1].total || 1)) - (b[1].correct / (b[1].total || 1)))
+    .map(([id, v]) => {
+      const q = QMAP[id];
+      return `
+        <tr>
+          <td>${escapeHtml(id)}</td>
+          <td>${escapeHtml(q ? q.question : "—")}</td>
+          <td>${escapeHtml(q ? q.diff : "—")}</td>
+          <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+          <td>${v.correct}/${v.total}</td>
+        </tr>
+      `;
+    }).join("");
+
+  const themeRows = Object.entries(stats.themes)
+    .map(([t, v]) => `
+      <tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${v.correct}/${v.total}</td>
+        <td>${Math.round(v.correct / (v.total || 1) * 100)}%</td>
+      </tr>
+    `).join("");
+
+  const reflectionPct = stats.reflectionReq
+    ? Math.round(stats.reflectionDone / stats.reflectionReq * 100)
+    : null;
+
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Bảng điều khiển giáo viên</div>
+        <h1>Kết quả lớp học</h1>
+        <p>
+          Tổng hợp theo học sinh, độ khó, chủ đề và loại bẫy.
+          Học sinh gửi mã kết quả; giáo viên dán mã để nhập vào báo cáo.
+        </p>
+      </div>
+      <div class="hero-card">
+        <strong>Ngưỡng đạt gợi ý</strong>
+        <p>≥80% và không lặp lại bẫy cá nhân. Câu sai sẽ tự động nằm trong danh sách tái kiểm tra.</p>
+        <span class="small">Có thể xuất CSV hoặc in báo cáo lớp.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <label style="font-weight:800;margin-right:8px">Lọc lớp:
+          <select id="classFilter" onchange="setTeacherClass(this.value)" style="display:inline-block;width:auto;margin-left:8px">
+            ${classOptions}
+          </select>
+        </label>
+        <button class="btn ghost" onclick="renderTeacher()">Làm mới</button>
+        <button class="btn ghost" onclick="exportCSV()">Xuất CSV</button>
+        <button class="btn ghost" onclick="window.print()">In báo cáo</button>
+        <button class="btn ghost" onclick="clearResults()">Xóa dữ liệu</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat"><span>Lượt làm</span><strong>${stats.attempts}</strong></div>
+        <div class="stat"><span>Điểm trung bình</span><strong>${stats.avg}%</strong></div>
+        <div class="stat"><span>Tỷ lệ đạt</span><strong>${stats.passRate}%</strong></div>
+        <div class="stat">
+          <span>Phiếu phản xạ</span>
+          <strong>${reflectionPct == null ? "—" : reflectionPct + "%"}</strong>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Học sinh</th>
+              <th>Lớp</th>
+              <th>Chế độ</th>
+              <th>%</th>
+              <th>Điểm</th>
+              <th>Thời gian</th>
+              <th>Sai</th>
+              <th>Phiếu</th>
+              <th>Mã</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || `<tr><td colspan="10" class="empty">Chưa có kết quả. Học sinh làm bài rồi gửi mã cho giáo viên.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Phổ bẫy yếu của lớp</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Loại bẫy</th><th>Sai/Tổng cơ hội</th><th>Độ chính xác</th></tr></thead>
+          <tbody>
+            ${trapRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Câu hỏi cần dạy lại</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Mã câu</th><th>Câu hỏi</th><th>Độ khó</th><th>%</th><th>Đúng/Tổng</th></tr>
+          </thead>
+          <tbody>
+            ${qRows || `<tr><td colspan="5" class="empty">Chưa có dữ liệu.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Theo chủ đề</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Chủ đề</th><th>Đúng/Tổng</th><th>%</th></tr></thead>
+          <tbody>${themeRows || `<tr><td colspan="3" class="empty">Chưa có dữ liệu.</td></tr>`}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin-top:0">Nhập mã kết quả từ học sinh</h2>
+      <p class="small">
+        Học sinh bấm “Sao chép mã” ở phiếu kết quả và gửi cho giáo viên.
+        Dán mã bắt đầu bằng <b>PHX1.</b> vào ô dưới.
+      </p>
+      <textarea class="code-area" id="importCode" placeholder="Dán mã PHX1..."></textarea>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn ghost" onclick="exportPDF()">📄 Xuất PDF kết quả</button>
+      <button class="btn primary" onclick="importResult()">Nhập mã kết quả</button>
+      </div>
+      <p class="small">
+        Nếu cùng một trình duyệt/máy, kết quả tự lưu và đã xuất hiện trong bảng trên.
+      </p>
+    </section>
+  `;
+}
+
+function setTeacherClass(v){
+  teacherClass = v;
+  renderTeacher();
+}
+
+function copyResultByIndex(i){
+  const r = teacherFiltered[i];
+  if (!r) return;
+  copyText(r.code || encodeResult(r));
+}
+
+function importResult(){
+  const ta = document.getElementById("importCode");
+  if (!ta) return;
+  const code = ta.value.trim();
+  if (!code){ showToast("Chưa có mã để nhập"); return; }
+
+  try {
+    const obj = decodeResult(code);
+    obj.id = obj.id || "imp_" + Date.now();
+    obj.code = code;
+
+    const arr = getResults();
+    const idx = arr.findIndex(x => x.id === obj.id);
+    if (idx >= 0) arr[idx] = obj;
+    else arr.push(obj);
+
+    saveResults(arr);
+    ta.value = "";
+    renderTeacher();
+    showToast("Đã nhập kết quả");
+  } catch(e){
+    showToast("Mã kết quả không hợp lệ");
+  }
+}
+
+function exportCSV(){
+  const data = teacherFiltered.length ? teacherFiltered : getResults();
+  const rows = [
+    ["Mã", "Ngày", "Học sinh", "Lớp", "Chế độ", "Điểm", "Tổng", "%", "Thời gian(s)", "Sai", "Phiếu phản xạ"]
+  ];
+
+  data.forEach(r => {
+    const total = Number(r.total) || (r.answers || []).length || 0;
+    const score = Number(r.score) || 0;
+    const req = (r.answers || []).filter(a => a.reflectionRequired).length;
+    const done = (r.answers || []).filter(a => a.reflectionRequired && a.reflectionDone).length;
+    rows.push([
+      r.id || "",
+      formatDate(r.dateISO),
+      r.student || "",
+      r.className || "",
+      r.modeLabel || MODE_LABELS[r.mode] || r.mode || "",
+      score,
+      total,
+      Number(r.percent) || 0,
+      Number(r.durationSec) || 0,
+      Math.max(0, total - score),
+      req ? `${done}/${req}` : "—"
+    ]);
+  });
+
+  const csv = rows.map(row =>
+    row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
+  ).join("\n");
+
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `bao-cao-phan-xa-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast("Đã xuất CSV");
+}
+
+function clearResults(){
+  if (!confirm("Xóa toàn bộ kết quả đã lưu trên trình duyệt này?")) return;
+  try { localStorage.removeItem(LS_KEY); } catch(e){}
+  memoryResults = [];
+  teacherClass = "";
+  renderTeacher();
+  showToast("Đã xóa dữ liệu");
+}
+
+/* =========================================================
+   12. ĐIỀU HƯỚNG & KHỞI TẠO
+   ========================================================= */
+function showSetup(){
+  if (state && !state.finished && state.answers && state.answers.length > 0){
+    if (!confirm("Bạn đang làm dở. Về màn hình bắt đầu sẽ mất tiến độ. Tiếp tục?")) return;
+  }
+  stopTimer();
+  state = { finished: true };
+  renderSetup();
+}
+
+function stopTimer(){
+  if (state && state.timerId){
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function startTimer(){
+  stopTimer();
+  state.qStart = Date.now();
+  updateTimer();
+  state.timerId = setInterval(updateTimer, 1000);
+}
+
+function updateTimer(){
+  if (!state || !state.qStart) return;
+  const sec = Math.floor((Date.now() - state.qStart) / 1000);
+  const el = document.getElementById("timer");
+  if (el) el.textContent = formatTime(sec);
+}
+
+/* Khởi chạy */
+renderSetup();
+function exportPDF(){
+  document.body.classList.add('print-result');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('print-result'),500);
+}
+</script>
+</body>
+</html>
